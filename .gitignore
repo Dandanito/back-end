@@ -1,0 +1,24 @@
+# ide & os
+.idea
+.DS_Store
+
+# build
+node_modules
+dist
+*.env
+
+# test
+/coverage
+
+# logs
+logs
+*.log
+
+# npm
+npm-debug.log*
+package-lock.json
+
+# yarn
+yarn.lock
+yarn-debug.log*
+yarn-error.log*
