@@ -1,4 +1,4 @@
-import { EnglishNumberSignsRegex, PhoneRegex } from '../../utils/regexes';
+import { EmailRegex, EnglishNumberSignsRegex, PhoneRegex } from '../../utils/regexes';
 import { createEntity, createModelUtils, Model } from '@mrnafisia/type-query';
 
 const UserTable = {
@@ -26,6 +26,12 @@ const UserTable = {
             default: false,
             nullable: false,
             regex: PhoneRegex
+        },
+        emailAddress: {
+            type: 'character varying',
+            default: false,
+            nullable: false,
+            regex: EmailRegex
         },
         address: {
             type: 'character varying',
@@ -88,6 +94,7 @@ type UserModel<R extends readonly (keyof (typeof UserTable)['columns'])[] = [
     'firstName',
     'lastName',
     'phoneNumber',
+    'emailAddress',
     'address',
     'nationalCode',
     'serial',
