@@ -1,4 +1,3 @@
-import { User } from '../user/schema';
 import { createEntity, createModelUtils, Model } from '@mrnafisia/type-query';
 
 const OrderTable = {
@@ -11,25 +10,21 @@ const OrderTable = {
             primary: true,
             default: 'auto-increment'
         },
+        description: {
+            type: 'character varying',
+            default: false,
+            nullable: false,
+            maxLength: 300
+        },
         customerID: {
             type: 'integer',
             default: false,
-            nullable: false,
-            reference: {
-                table: User.table,
-                column: 'id',
-                onDelete: 'cascade'
-            }
+            nullable: false
         },
-        sellerID: {
+        labID: {
             type: 'integer',
             default: false,
-            nullable: false,
-            reference: {
-                table: User.table,
-                column: 'id',
-                onDelete: 'cascade'
-            }
+            nullable: false
         },
         price: {
             type: 'bigint',
@@ -47,8 +42,9 @@ const OrderTable = {
 const Order = createEntity(OrderTable);
 type OrderModel<R extends readonly (keyof (typeof OrderTable)['columns'])[] = [
     'id',
+    'description',
     'customerID',
-    'sellerID',
+    'labID',
     'price',
     'date'
 ],
