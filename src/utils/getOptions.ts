@@ -1,5 +1,4 @@
-import { OrderDirection } from '@mrnafisia/type-query';
-import Table from '@mrnafisia/type-query/dist/types/table';
+import { OrderDirection, Table } from '@mrnafisia/type-query';
 
 type GetOptions<Column extends Table['columns']> = {
     fields: (keyof Column)[];

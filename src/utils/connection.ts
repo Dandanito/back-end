@@ -1,5 +1,5 @@
 import { ClientBase } from '@mrnafisia/type-query';
-import { UserModel } from '../features/User/schema';
+import { UserModel } from '../features/user/schema';
 
 type Connection = {
     client: ClientBase;
