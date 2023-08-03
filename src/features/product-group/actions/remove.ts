@@ -24,7 +24,9 @@ const remove = async (
         ['id'] as const
     ).exec(connection.client, ['get', 'one']);
     if (!removeProductGroupResult.ok) {
-        return err([401, removeProductGroupResult.error]);
+        return err(
+            removeProductGroupResult.error === false ? [302] : [401, removeProductGroupResult.error]
+        );
     }
 
     return ok({

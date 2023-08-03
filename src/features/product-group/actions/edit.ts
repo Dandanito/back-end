@@ -30,7 +30,9 @@ const edit = async (
         ['id'] as const
     ).exec(connection.client, ['get', 'one']);
     if (!editProductGroupResult.ok) {
-        return err([401, editProductGroupResult.error]);
+        return err(
+            editProductGroupResult.error === false ? [302] : [401, editProductGroupResult.error]
+        );
     }
 
     return ok({
