@@ -1,4 +1,5 @@
 import Error from '../error';
+import { getProduct } from '../utils';
 import { err, ok, Result } from 'never-catch';
 import { Product, ProductModel } from '../schema';
 import { Connection } from '../../../utils/connection';
@@ -25,15 +26,13 @@ const edit = async (
         return err([205]);
     }
 
-    // check product existence
-    const getProductResult = await Product.select(
-        ['id', 'labID'] as const,
-        context => context.colCmp('id', '=', id)
-    ).exec(connection.client, ['get', 'one']);
+    // get product
+    const getProductResult = await getProduct(
+        connection,
+        id
+    );
     if (!getProductResult.ok) {
-        return err(
-            getProductResult.error === false ? [302] : [401, getProductResult.error]
-        );
+        return getProductResult;
     }
 
     // permission
