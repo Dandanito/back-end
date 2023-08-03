@@ -1,6 +1,6 @@
 const Role = {
     Admin: 'admin',
-    Seller: 'seller',
+    Laboratory: 'laboratory',
     Customer: 'customer'
 } as const;
 
