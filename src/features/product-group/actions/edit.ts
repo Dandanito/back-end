@@ -1,8 +1,8 @@
-import { Connection } from '../../../utils/connection';
-import { ProductGroup, ProductGroupModel } from '../schema';
-import { err, ok, Result } from 'never-catch';
 import Error from '../error';
 import { Role } from '../../user/roles';
+import { err, ok, Result } from 'never-catch';
+import { Connection } from '../../../utils/connection';
+import { ProductGroup, ProductGroupModel } from '../schema';
 
 const edit = async (
     connection: Connection,

@@ -4,13 +4,13 @@ import { err, ok, Result } from 'never-catch';
 import { Connection } from '../../../utils/connection';
 import { ProductGroup, ProductGroupModel } from '../schema';
 
-const add = async (
+const remove = async (
     connection: Connection,
-    title: ProductGroupModel['title']
+    id: ProductGroupModel['id']
 ): Promise<Result<{ id: ProductGroupModel['id'] }, Error>> => {
     // validation
-    if (!ProductGroupModel.title.Validate(title)) {
-        return err([201]);
+    if (!ProductGroupModel.id.Validate(id)) {
+        return err([202]);
     }
 
     // permission
@@ -18,18 +18,18 @@ const add = async (
         return err([301]);
     }
 
-    // add
-    const addProductGroupResult = await ProductGroup.insert(
-        [{ title }],
+    // remove
+    const removeProductGroupResult = await ProductGroup.delete(
+        context => context.colCmp('id', '=', id),
         ['id'] as const
     ).exec(connection.client, ['get', 'one']);
-    if (!addProductGroupResult.ok) {
-        return err([401, addProductGroupResult.error]);
+    if (!removeProductGroupResult.ok) {
+        return err([401, removeProductGroupResult.error]);
     }
 
     return ok({
-        id: addProductGroupResult.value.id
+        id: removeProductGroupResult.value.id
     });
 };
 
-export default add;
+export default remove;
