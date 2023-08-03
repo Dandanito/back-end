@@ -3,7 +3,7 @@ import { UserModel } from '../features/user/schema';
 
 type Connection = {
     client: ClientBase;
-    userID: UserModel['id'];
+    user: UserModel<['id', 'role']>;
 };
 
 export type { Connection };
