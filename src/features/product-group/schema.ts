@@ -16,6 +16,13 @@ const ProductGroupTable = {
             nullable: false,
             minLength: 2,
             maxLength: 100
+        },
+        fileUUID: {
+            type: 'uuid',
+            nullable: false,
+            default: false,
+            minLength: 36,
+            maxLength: 36
         }
     }
 } as const;
@@ -23,7 +30,8 @@ const ProductGroupTable = {
 const ProductGroup = createEntity(ProductGroupTable);
 type ProductGroupModel<R extends readonly (keyof (typeof ProductGroupTable)['columns'])[] = [
     'id',
-    'title'
+    'title',
+    'fileUUID'
 ],
     O extends readonly (keyof (typeof ProductGroupTable)['columns'])[] = []> = Model<(typeof ProductGroupTable)['columns'], R, O>;
 const ProductGroupModel = createModelUtils(ProductGroup.table.columns);
