@@ -4,7 +4,7 @@ import { Token, TokenModel } from '../schema';
 import { Connection } from '../../../utils/connection';
 
 const logout = async (
-    { client }: Omit<Connection, 'userID'>,
+    { client }: Omit<Connection, 'user'>,
     secret: TokenModel['secret']
 ): Promise<
     Result<

@@ -10,7 +10,7 @@ import { UploadedFile } from 'express-fileupload';
 import { Connection } from '../../../utils/connection';
 
 const upload = async (
-    connection: Omit<Connection, 'userID'>,
+    connection: Omit<Connection, 'user'>,
     file: UploadedFile
 ): Promise<Result<{ uuid: FileModel['uuid']; }, Error>> => {
     // check limits
@@ -103,7 +103,7 @@ const doesExtensionsMatch = (
     (nameExtension === 'jpeg' && typeExtension === 'jpg');
 
 const addFile = async (
-    { client }: Omit<Connection, 'userID'>,
+    { client }: Omit<Connection, 'user'>,
     file: FileModel<['size', 'name', 'extension', 'mimeType']>
 ): Promise<Result<{ file: FileModel<['id', 'uuid']>; }, Error>> => {
     const addingFile = {

@@ -5,34 +5,26 @@ import { User, UserModel } from '../../user/schema';
 import { Connection } from '../../../utils/connection';
 
 const whoAmI = async (
-    { client }: Omit<Connection, 'userID'>,
+    { client }: Omit<Connection, 'user'>,
     secret: TokenModel['secret']
-): Promise<
-    Result<
-        {
-            user: UserModel<
-                ['id',
-                    'firstName',
-                    'lastName',
-                    'phoneNumber',
-                    'emailAddress',
-                    'address',
-                    'nationalCode',
-                    'serial',
-                    'serialConfirmation',
-                    'vote',
-                    'voteCount',
-                    'password',
-                    'hasDelivery',
-                    'role']
-                >;
-            token: TokenModel<
-                ['id', 'userID', 'secret', 'createdAt', 'expireAt']
-                >;
-        },
-        Error
-        >
-    > => {
+): Promise<Result<{
+    user: UserModel<['id',
+        'firstName',
+        'lastName',
+        'phoneNumber',
+        'emailAddress',
+        'address',
+        'nationalCode',
+        'serial',
+        'serialConfirmation',
+        'vote',
+        'voteCount',
+        'password',
+        'hasDelivery',
+        'role']>;
+    token: TokenModel<['id', 'userID', 'secret', 'createdAt', 'expireAt']>;
+},
+    Error>> => {
     // validation
     if (!TokenModel.secret.Validate(secret)) {
         return err([203]);
@@ -98,7 +90,7 @@ const whoAmI = async (
             voteCount: infoResult.value.u_voteCount,
             password: infoResult.value.u_password,
             hasDelivery: infoResult.value.u_hasDelivery,
-            role: infoResult.value.u_role,
+            role: infoResult.value.u_role
         },
         token: {
             id: infoResult.value.t_id,

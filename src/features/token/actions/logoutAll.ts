@@ -5,27 +5,23 @@ import { Token, TokenModel } from '../schema';
 import { Connection } from '../../../utils/connection';
 
 const logoutAll = async (
-    connection: Omit<Connection, 'userID'>,
+    connection: Omit<Connection, 'user'>,
     id: UserModel['id']
-): Promise<
-    Result<
-        {
-            ids: TokenModel['id'][];
-            userID: TokenModel['userID'];
-        },
-        Error
-        >
-    > => {
+): Promise<Result<{
+    ids: TokenModel['id'][];
+    userID: TokenModel['userID'];
+},
+    Error>> => {
     // validation
-    if (!UserModel.id.Validate(id)){
-        return err([205])
+    if (!UserModel.id.Validate(id)) {
+        return err([205]);
     }
 
     // remove tokens
     const removeTokensResult = await removeTokens({
-        client: connection.client,
-        userID: id
-    });
+            client: connection.client
+        },
+        id);
     if (!removeTokensResult.ok) {
         return removeTokensResult;
     }
@@ -34,17 +30,12 @@ const logoutAll = async (
 };
 
 const removeTokens = async ({
-                                client,
-                                userID
-                            }: Connection): Promise<
-    Result<
-        {
-            ids: TokenModel['id'][];
-            userID: TokenModel['userID'];
-        },
-        Error
-        >
-    > => {
+                                client
+                            }: Omit<Connection, 'user'>, userID: UserModel['id']): Promise<Result<{
+    ids: TokenModel['id'][];
+    userID: TokenModel['userID'];
+},
+    Error>> => {
     const removedTokensResult = await Token.delete(
         context => context.colCmp('userID', '=', userID),
         ['id'] as const

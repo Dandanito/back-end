@@ -4,7 +4,7 @@ import { Log, LogModel } from '../schema';
 import { Connection } from '../../../utils/connection';
 
 const addLog = (
-    { client }: Omit<Connection, 'userID'>,
+    { client }: Omit<Connection, 'user'>,
     log: LogModel<['api', 'headers', 'body', 'response', 'receivedAt', 'respondedAt'],
         ['id']>
 ): Promise<Result<{ id: LogModel['id'] }, Error>> =>

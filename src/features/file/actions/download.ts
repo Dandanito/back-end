@@ -4,7 +4,7 @@ import { File, FileModel } from '../schema';
 import { Connection } from '../../../utils/connection';
 
 const download = async (
-    { client }: Omit<Connection, 'userID'>,
+    { client }: Omit<Connection, 'user'>,
     uuid: FileModel['uuid']
 ): Promise<Result<FileModel<['id', 'uuid', 'name', 'mimeType']>, Error>> => {
     const result = await File.select(

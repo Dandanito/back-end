@@ -4,9 +4,10 @@ import { Token, TokenModel } from '../schema';
 import { Connection } from '../../../utils/connection';
 import { generateToken } from '../util';
 import { Constants } from '../constant';
+import { UserModel } from '../../user/schema';
 
 const extend = async (
-    connection: Omit<Connection, 'userID'>,
+    connection: Omit<Connection, 'user'>,
     secret: TokenModel['secret']
 ): Promise<
     Result<TokenModel<
@@ -35,7 +36,8 @@ const extend = async (
 
     // extend
     const extendTokenResult = await extendToken(
-        { client: connection.client, userID },
+        { client: connection.client },
+        userID,
         tokenID
     );
     if (!extendTokenResult.ok) {
@@ -56,7 +58,7 @@ const checkValidation = (
 };
 
 const checkExpireAndRemainedTime = async (
-    { client }: Omit<Connection, 'userID'>,
+    { client }: Omit<Connection, 'user'>,
     secret: TokenModel['secret']
 ): Promise<Result<TokenModel<['id', 'userID']>, Error>> => {
     // get token
@@ -87,7 +89,8 @@ const checkExpireAndRemainedTime = async (
 };
 
 const extendToken = async (
-    { client, userID }: Connection,
+    { client }: Omit<Connection, 'user'>,
+    userID: UserModel['id'],
     id: TokenModel['id']
 ): Promise<
     Result<
@@ -99,7 +102,7 @@ const extendToken = async (
         Error
         >
     > => {
-    const tokenResult = await generateToken({ client, userID });
+    const tokenResult = await generateToken({ client }, userID);
     if (!tokenResult.ok) {
         return tokenResult;
     }

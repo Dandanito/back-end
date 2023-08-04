@@ -11,7 +11,7 @@ import {
 import { Constants } from '../constant';
 
 const login = async (
-    connection: Omit<Connection, 'userID'>,
+    connection: Omit<Connection, 'user'>,
     user: UserModel<['password'], ['emailAddress', 'phoneNumber']>
 ): Promise<Result<TokenModel<['id', 'userID', 'createdAt', 'expireAt', 'secret']>,
     Error>> => {
@@ -35,9 +35,8 @@ const login = async (
     // current tokens
     const removeExpiredTokensAndCountTheRestResult =
         await removeExpiredTokensAndCountTheRest({
-            client: connection.client,
-            userID
-        });
+            client: connection.client
+        }, userID);
     if (!removeExpiredTokensAndCountTheRestResult.ok) {
         return removeExpiredTokensAndCountTheRestResult;
     }
@@ -50,9 +49,8 @@ const login = async (
 
     // add token
     const addTokenResult = await addToken({
-        client: connection.client,
-        userID
-    });
+        client: connection.client
+    }, userID);
     if (!addTokenResult.ok) {
         return addTokenResult;
     }
@@ -83,11 +81,10 @@ const checkValidation = (
 };
 
 const addToken = async ({
-                            client,
-                            userID
-                        }: Connection): Promise<Result<TokenModel<['id', 'userID', 'secret', 'createdAt', 'expireAt']>,
+                            client
+                        }: Omit<Connection, 'user'>, userID: UserModel['id']): Promise<Result<TokenModel<['id', 'userID', 'secret', 'createdAt', 'expireAt']>,
     Error>> => {
-    const tokenResult = await generateToken({ client, userID });
+    const tokenResult = await generateToken({ client }, userID);
     if (!tokenResult.ok) {
         return tokenResult;
     }

@@ -9,7 +9,7 @@ import { Constants } from './constant';
 const Crypto = require('crypto');
 
 const checkCredentialAndGetUserID = async (
-    { client }: Omit<Connection, 'userID'>,
+    { client }: Omit<Connection, 'user'>,
     { emailAddress, phoneNumber, password }: UserModel<['password'], ['emailAddress', 'phoneNumber']>
 ): Promise<Result<UserModel['id'], Error>> => {
     const userResult = await User.select(['id', 'password'] as const, context =>
@@ -33,9 +33,8 @@ const checkCredentialAndGetUserID = async (
 };
 
 const removeExpiredTokensAndCountTheRest = async ({
-                                                      client,
-                                                      userID
-                                                  }: Connection): Promise<
+                                                      client
+                                                  }: Omit<Connection, 'user'>, userID: UserModel['id']): Promise<
     Result<{ number: number }, Error>
     > => {
 
@@ -71,7 +70,7 @@ const removeExpiredTokensAndCountTheRest = async ({
 
 const generateUniqueSecret = async ({
                                         client
-                                    }: Omit<Connection, 'userID'>): Promise<
+                                    }: Omit<Connection, 'user'>): Promise<
     Result<TokenModel<['secret']>, Error>
     > => {
     const secret = (await Crypto.randomBytes(TOKEN_SECRET_LENGTH / 2)).toString(
@@ -87,9 +86,8 @@ const generateUniqueSecret = async ({
 };
 
 const generateToken = async ({
-                                 client,
-                                 userID
-                             }: Connection): Promise<
+                                 client
+                             }: Omit<Connection, 'user'>, userID: UserModel['id']): Promise<
     Result<TokenModel<['userID', 'secret', 'createdAt', 'expireAt']>, Error>
     > => {
     const uniqueSecretResult = await generateUniqueSecret({ client });
