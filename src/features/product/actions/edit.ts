@@ -1,10 +1,10 @@
 import Error from '../error';
 import { getProduct } from '../utils';
+import { moveFiles } from '../../file/util';
+import { FileModel } from '../../file/schema';
 import { err, ok, Result } from 'never-catch';
 import { Product, ProductModel } from '../schema';
 import { Connection } from '../../../utils/connection';
-import { FileModel } from '../../../../dist/features/file/schema';
-import { moveFiles } from '../../file/util';
 
 const edit = async (
     connection: Connection,

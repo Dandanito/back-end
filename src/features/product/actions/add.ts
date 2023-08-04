@@ -1,10 +1,10 @@
 import Error from '../error';
 import { Role } from '../../user/roles';
+import { moveFiles } from '../../file/util';
 import { err, ok, Result } from 'never-catch';
+import { FileModel } from '../../file/schema';
 import { Product, ProductModel } from '../schema';
 import { Connection } from '../../../utils/connection';
-import { FileModel } from '../../../../dist/features/file/schema';
-import { moveFiles } from '../../file/util';
 
 const add = async (
     connection: Connection,
