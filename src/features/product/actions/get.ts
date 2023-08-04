@@ -1,7 +1,7 @@
 import Error from '../error';
 import { err, ok, Result } from 'never-catch';
-import { Product, ProductModel } from '../schema';
 import { Context, U } from '@mrnafisia/type-query';
+import { Product, ProductModel } from '../schema';
 import { Connection } from '../../../utils/connection';
 import { GetOptions } from '../../../utils/getOptions';
 

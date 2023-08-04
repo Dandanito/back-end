@@ -1,32 +1,21 @@
 import { Error } from '../error';
 import { v4 as uuid } from 'uuid';
 import path, { join } from 'path';
-import { FILES_DIR } from '../util';
-import { Operation } from '../operation';
+import { Constants } from '../constant';
 import { isBinaryFile } from 'isbinaryfile';
 import { File, FileModel } from '../schema';
 import { fileTypeFromFile } from 'file-type';
 import { err, ok, Result } from 'never-catch';
-import { Constant } from '../../Constant/schema';
 import { UploadedFile } from 'express-fileupload';
-import { Feature } from '../../../utils/type/Feature';
-import { Connection } from '../../../utils/type/Connection';
-import { HistoryRow } from '../../../utils/type/HistoryRow';
-
-type Limit = { size: number; allowedExtensions: string[] };
+import { Connection } from '../../../utils/connection';
 
 const upload = async (
     connection: Omit<Connection, 'userID'>,
-    file: UploadedFile,
-    feature: FileModel['feature']
-): Promise<
-    Result<{ uuid: FileModel['uuid']; histories: HistoryRow[] }, Error>
-> => {
+    file: UploadedFile
+): Promise<Result<{ uuid: FileModel['uuid']; }, Error>> => {
     // check limits
     const checkLimitsAndGetFileTypeResult = await checkLimitsAndGetFileType(
-        connection,
-        file,
-        feature
+        file
     );
     if (!checkLimitsAndGetFileTypeResult.ok) {
         return checkLimitsAndGetFileTypeResult;
@@ -38,20 +27,18 @@ const upload = async (
         size: file.size,
         name: decodeURIComponent(file.name),
         extension,
-        mimeType,
-        feature
+        mimeType
     });
     if (!addFileResult.ok) {
         return addFileResult;
     }
     const {
-        file: { id, uuid },
-        histories
+        file: { id, uuid }
     } = addFileResult.value;
 
     // move
     const moveResult: Result<undefined, Error> = await file
-        .mv(join(FILES_DIR, `${id}_${uuid}`))
+        .mv(join(Constants.FILES_DIR, `${id}_${uuid}`))
         .then(() => ok(undefined))
         .catch(error => err([402, JSON.stringify(error)]));
     if (!moveResult.ok) {
@@ -59,29 +46,15 @@ const upload = async (
     }
 
     return ok({
-        uuid,
-        histories
+        uuid
     });
 };
 
 const checkLimitsAndGetFileType = async (
-    { client }: Omit<Connection, 'userID'>,
-    file: UploadedFile,
-    feature: FileModel['feature']
+    file: UploadedFile
 ): Promise<Result<{ extension: string; mimeType: string }, Error>> => {
-    // get limits
-    const getLimitsByFeatureResult = await getLimitsByFeature(
-        { client },
-        feature
-    );
-    if (!getLimitsByFeatureResult.ok) {
-        return getLimitsByFeatureResult;
-    }
-    const { size: sizeLimit, allowedExtensions } =
-        getLimitsByFeatureResult.value;
-
     // size limit
-    if (file.size > sizeLimit) {
+    if (file.size > Constants.size) {
         return err([303]);
     }
 
@@ -89,17 +62,17 @@ const checkLimitsAndGetFileType = async (
     const extension = path.extname(file.name).slice(1);
     const fileType = await fileTypeFromFile(file.tempFilePath);
     const isBinary = await isBinaryFile(file.data, file.size);
-    if (allowedExtensions.length !== 0) {
+    if (Constants.allowedExtensions.length !== 0) {
         if (fileType !== undefined) {
             if (
-                !allowedExtensions.includes(fileType.ext) ||
+                !Constants.allowedExtensions.includes(fileType.ext) ||
                 !doesExtensionsMatch(extension, fileType.ext)
             ) {
                 return err([304]);
             }
             return ok({ extension, mimeType: fileType.mime });
         } else {
-            if (isBinary || !allowedExtensions.includes(extension)) {
+            if (isBinary || !Constants.allowedExtensions.includes(extension)) {
                 return err([304]);
             }
             return ok({ extension, mimeType: 'text/plain' });
@@ -122,33 +95,6 @@ const checkLimitsAndGetFileType = async (
     }
 };
 
-const getLimitsByFeature = async (
-    { client }: Omit<Connection, 'userID'>,
-    feature: FileModel['feature']
-): Promise<Result<Limit, Error>> => {
-    const result = (await Constant.select(['data'] as const, context =>
-        context.colCmp('feature', '=', Feature.File)
-    ).exec(client, ['get', 'one'])) as Result<
-        {
-            data: {
-                limits?: Record<string, Limit>;
-            };
-        },
-        unknown
-    >;
-    if (!result.ok && result.error !== false) {
-        return err([401, result.error]);
-    }
-    if (!result.ok || result.value.data['limits'] === undefined) {
-        return err([403]);
-    }
-    if (result.value.data['limits'][feature] === undefined) {
-        return err([302]);
-    }
-
-    return ok(result.value.data['limits'][feature]);
-};
-
 const doesExtensionsMatch = (
     nameExtension: string,
     typeExtension: string
@@ -158,10 +104,8 @@ const doesExtensionsMatch = (
 
 const addFile = async (
     { client }: Omit<Connection, 'userID'>,
-    file: FileModel<['size', 'name', 'extension', 'mimeType', 'feature']>
-): Promise<
-    Result<{ file: FileModel<['id', 'uuid']>; histories: HistoryRow[] }, Error>
-> => {
+    file: FileModel<['size', 'name', 'extension', 'mimeType']>
+): Promise<Result<{ file: FileModel<['id', 'uuid']>; }, Error>> => {
     const addingFile = {
         ...file,
         uuid: uuid(),
@@ -175,22 +119,10 @@ const addFile = async (
     if (!result.ok) {
         return err([401, result.error]);
     }
-    const id = result.value.id;
 
     return ok({
-        file: result.value,
-        histories: [
-            {
-                yearCompanyID: null,
-                feature: Feature.File,
-                table: File.table.title,
-                row: id,
-                operations: [Operation.Upload],
-                data: { ...addingFile, id }
-            }
-        ]
+        file: result.value
     });
 };
 
-export type { Limit };
-export { upload, checkLimitsAndGetFileType, getLimitsByFeature, addFile };
+export { upload, checkLimitsAndGetFileType, addFile };

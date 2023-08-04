@@ -1,7 +1,7 @@
 import { Error } from '../error';
 import { err, Result } from 'never-catch';
 import { File, FileModel } from '../schema';
-import { Connection } from '../../../utils/type/Connection';
+import { Connection } from '../../../utils/connection';
 
 const download = async (
     { client }: Omit<Connection, 'userID'>,

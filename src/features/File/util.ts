@@ -1,26 +1,17 @@
 import { Error } from './error';
-import { Operation } from './operation';
 import { File, FileModel } from './schema';
 import { err, ok, Result } from 'never-catch';
-import { Feature } from '../../utils/type/Feature';
-import { Connection } from '../../utils/type/Connection';
-import { HistoryRow } from '../../utils/type/HistoryRow';
-import { getEnvironmentVariable } from '../../utils/getEnvironmentVariable';
-
-const TEMP_FILES_DIR = getEnvironmentVariable('HERMES_TEMP_FILES_DIR');
-const FILES_DIR = getEnvironmentVariable('HERMES_FILES_DIR');
+import { Connection } from '../../utils/connection';
 
 const getFiles = async (
-    { client }: Omit<Connection, 'userID'>,
+    { client }: Omit<Connection, 'user'>,
     uuids: FileModel['uuid'][],
-    isTemp: boolean,
-    feature: keyof typeof Feature
+    isTemp: boolean
 ): Promise<Result<FileModel<['id', 'uuid']>[], Error>> => {
     const result = await File.select(['id', 'uuid'] as const, context =>
         context.colsAnd({
             uuid: ['in', uuids],
-            isTemp: [isTemp ? '= true' : '= false'],
-            feature: ['=', feature]
+            isTemp: [isTemp ? '= true' : '= false']
         })
     ).exec(client, ['get', uuids.length]);
     if (!result.ok) {
@@ -31,9 +22,9 @@ const getFiles = async (
 };
 
 const makeFilesPermanent = async (
-    { client }: Omit<Connection, 'userID'>,
+    { client }: Omit<Connection, 'user'>,
     ids: FileModel['id'][]
-): Promise<Result<HistoryRow[], Error>> => {
+): Promise<Result<undefined, Error>> => {
     const result = await File.update(
         { isTemp: false },
         context => context.colList('id', 'in', ids),
@@ -43,22 +34,13 @@ const makeFilesPermanent = async (
         return err([401, result.error]);
     }
 
-    return ok(
-        ids.map(id => ({
-            yearCompanyID: null,
-            feature: Feature.File,
-            table: File.table.title,
-            row: id,
-            operations: [Operation.Edit_MakePermanent],
-            data: { id, isTemp: false }
-        }))
-    );
+    return ok(undefined);
 };
 
 const removePermanentFiles = async (
-    { client }: Omit<Connection, 'userID'>,
+    { client }: Omit<Connection, 'user'>,
     ids: FileModel['id'][]
-): Promise<Result<HistoryRow[], Error>> => {
+): Promise<Result<undefined, Error>> => {
     const result = await File.delete(
         context => context.colList('id', 'in', ids),
         ['id'] as const
@@ -67,31 +49,19 @@ const removePermanentFiles = async (
         return err([401, result.error]);
     }
 
-    return ok(
-        ids.map(id => ({
-            yearCompanyID: null,
-            feature: Feature.File,
-            table: File.table.title,
-            row: id,
-            operations: [Operation.Remove],
-            data: { id }
-        }))
-    );
+    return ok(undefined);
 };
 
 const moveFiles = async (
-    { client }: Omit<Connection, 'userID'>,
+    { client }: Omit<Connection, 'user'>,
     uuids: FileModel['uuid'][],
-    feature: keyof typeof Feature,
     action: 'attach' | 'remove'
-): Promise<Result<HistoryRow[], Error>> => {
-    const histories: HistoryRow[] = [];
+): Promise<Result<undefined, Error>> => {
 
     const getFilesResult = await getFiles(
         { client },
         uuids,
-        action === 'attach',
-        feature
+        action === 'attach'
     );
     if (!getFilesResult.ok) {
         return getFilesResult;
@@ -106,7 +76,6 @@ const moveFiles = async (
         if (!makeFilesPermanentResult.ok) {
             return makeFilesPermanentResult;
         }
-        histories.push(...makeFilesPermanentResult.value);
     } else {
         const removePermanentFilesResult = await removePermanentFiles(
             { client },
@@ -115,11 +84,9 @@ const moveFiles = async (
         if (!removePermanentFilesResult.ok) {
             return removePermanentFilesResult;
         }
-        histories.push(...removePermanentFilesResult.value);
     }
 
-    return ok(histories);
+    return ok(undefined);
 };
 
-export { TEMP_FILES_DIR, FILES_DIR };
 export { getFiles, makeFilesPermanent, removePermanentFiles, moveFiles };

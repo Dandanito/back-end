@@ -1,4 +1,3 @@
-import { parseFeature } from '../../utils/type/Feature';
 import { EnglishNumberSignsRegex } from '../../utils/regexes';
 import {
     createEntity,
@@ -60,13 +59,6 @@ const FileTable = {
             type: 'timestamp with time zone',
             nullable: false,
             default: false
-        },
-        feature: {
-            type: 'character varying',
-            nullable: false,
-            default: false,
-            minLength: 2,
-            maxLength: 60
         }
     }
 } as const;
@@ -80,8 +72,7 @@ type FileModel<
         'name',
         'extension',
         'mimeType',
-        'createdAt',
-        'feature'
+        'createdAt'
     ],
     O extends readonly (keyof (typeof FileTable)['columns'])[] = []
 > = Model<(typeof FileTable)['columns'], R, O>;
@@ -97,8 +88,7 @@ const FileModel = createModelUtils(File.table.columns, {
                 return undefined;
             }
             return parsed;
-        },
-        feature: parseFeature
+        }
     }
 });
 
