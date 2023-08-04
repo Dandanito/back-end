@@ -1,6 +1,6 @@
-import { createEntity, createModelUtils, Model } from '@mrnafisia/type-query';
+import { createEntity, createModelUtils, Model, Table } from '@mrnafisia/type-query';
 
-const OrderTable = {
+const OrderTable: Table = {
     title: 'order',
     schema: 'general',
     columns: {
@@ -35,6 +35,22 @@ const OrderTable = {
             type: 'timestamp with time zone',
             default: false,
             nullable: false
+        },
+        productIDs: {
+            type: 'jsonb',
+            default: false,
+            nullable: false
+        },
+        discountData: {
+            type: 'jsonb',
+            default: false,
+            nullable: false
+        },
+        status: {
+            type: 'smallint',
+            default: false,
+            nullable: false,
+            max: 2
         }
     }
 } as const;
