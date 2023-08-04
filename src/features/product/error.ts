@@ -5,6 +5,7 @@ type Error =
     | [204] /* invalid id */
     | [205] /* at least one change is required */
     | [206] /* invalid lab id */
+    | [207] /* invalid file uuid */
     | [301] /* permission denied */
     | [302] /* product does not exist */
     | [401, unknown]

@@ -44,6 +44,11 @@ const ProductTable = {
             type: 'bigint',
             default: false,
             nullable: false
+        },
+        fileUUIDs: {
+            type: 'jsonb',
+            default: false,
+            nullable: false
         }
     }
 } as const;
@@ -56,7 +61,8 @@ type ProductModel<R extends readonly (keyof (typeof ProductTable)['columns'])[] 
     'labID',
     'vote',
     'voteCount',
-    'price'
+    'price',
+    'fileUUIDs'
 ],
     O extends readonly (keyof (typeof ProductTable)['columns'])[] = []> = Model<(typeof ProductTable)['columns'], R, O>;
 const ProductModel = createModelUtils(Product.table.columns);

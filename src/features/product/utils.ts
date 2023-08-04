@@ -6,10 +6,10 @@ import { Connection } from '../../utils/connection';
 const getProduct = async (
     { client }: Omit<Connection, 'user'>,
     id: ProductModel['id']
-): Promise<Result<ProductModel<['id', 'labID']>, Error>> => {
+): Promise<Result<ProductModel<['id', 'labID', 'fileUUIDs']> & { fileUUIDs: string[] }, Error>> => {
     // check existence
     const getProductResult = await Product.select(
-        ['id', 'labID'] as const,
+        ['id', 'labID', 'fileUUIDs'] as const,
         context => context.colCmp('id', '=', id)
     ).exec(client, ['get', 'one']);
     if (!getProductResult.ok) {
@@ -18,7 +18,7 @@ const getProduct = async (
         );
     }
 
-    return ok(getProductResult.value);
+    return ok(getProductResult.value as typeof getProductResult.value & { fileUUIDs: string[] });
 };
 
 export { getProduct };
