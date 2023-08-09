@@ -1,6 +1,6 @@
-import { createEntity, createModelUtils, Model, Table } from '@mrnafisia/type-query';
+import { createEntity, createModelUtils, Model } from '@mrnafisia/type-query';
 
-const OrderTable: Table = {
+const OrderTable = {
     title: 'order',
     schema: 'general',
     columns: {
@@ -41,7 +41,7 @@ const OrderTable: Table = {
             default: false,
             nullable: false
         },
-        discountData: {
+        data: {
             type: 'jsonb',
             default: false,
             nullable: false
@@ -62,7 +62,10 @@ type OrderModel<R extends readonly (keyof (typeof OrderTable)['columns'])[] = [
     'customerID',
     'labID',
     'price',
-    'date'
+    'date',
+    'productIDs',
+    'data',
+    'status'
 ],
     O extends readonly (keyof (typeof OrderTable)['columns'])[] = []> = Model<(typeof OrderTable)['columns'], R, O>;
 const OrderModel = createModelUtils(Order.table.columns);
