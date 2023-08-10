@@ -5,10 +5,18 @@ import { err, ok, Result } from 'never-catch';
 import { FileModel } from '../../file/schema';
 import { Product, ProductModel } from '../schema';
 import { Connection } from '../../../utils/connection';
+import { DiscountType } from '../constant';
 
 const add = async (
     connection: Connection,
-    { title, description, price, fileUUIDs }: ProductModel<['title', 'description', 'price', 'fileUUIDs']> & {fileUUIDs: string[]}
+    {
+        title,
+        description,
+        price,
+        fileUUIDs,
+        discount,
+        discountType
+    }: ProductModel<['title', 'description', 'price', 'fileUUIDs'], ['discount', 'discountType']> & { fileUUIDs: string[] }
 ): Promise<Result<{ id: ProductModel['id'] }, Error>> => {
     // validation
     if (!ProductModel.title.Validate(title)) {
@@ -20,10 +28,13 @@ const add = async (
     if (!ProductModel.price.Validate(price)) {
         return err([203]);
     }
-    for (const fileUUID of fileUUIDs){
-        if (!FileModel.uuid.Validate(fileUUID)){
-            return err([207])
+    for (const fileUUID of fileUUIDs) {
+        if (!FileModel.uuid.Validate(fileUUID)) {
+            return err([207]);
         }
+    }
+    if (discountType === undefined && discount !== undefined || discountType !== undefined && discount === undefined) {
+        return err([208]);
     }
 
     // permission
@@ -41,7 +52,9 @@ const add = async (
                 vote: 0,
                 voteCount: 0,
                 labID: connection.user.id,
-                fileUUIDs
+                fileUUIDs,
+                discount: discount !== undefined ? discount : BigInt(0),
+                discountType: discountType !== undefined ? discountType : DiscountType.None
             }
         ],
         ['id'] as const

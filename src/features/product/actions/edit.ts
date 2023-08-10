@@ -13,8 +13,10 @@ const edit = async (
         title,
         description,
         price,
-        fileUUIDs
-    }: ProductModel<['id'], ['title', 'description', 'price', 'fileUUIDs']> & { fileUUIDs?: FileModel['uuid'][] }
+        fileUUIDs,
+        discount,
+        discountType
+    }: ProductModel<['id'], ['title', 'description', 'price', 'fileUUIDs', 'discount', 'discountType']> & { fileUUIDs?: FileModel['uuid'][] }
 ): Promise<Result<{ id: ProductModel['id'] }, Error>> => {
     // validation
     if (!ProductModel.id.Validate(id)) {
@@ -35,6 +37,10 @@ const edit = async (
                 return err([207]);
             }
         }
+    }
+
+    if (discountType === undefined && discount !== undefined || discountType !== undefined && discount === undefined) {
+        return err([208]);
     }
 
     if (title === undefined && description === undefined && price === undefined) {
@@ -61,7 +67,9 @@ const edit = async (
             title,
             description,
             price,
-            fileUUIDs
+            fileUUIDs,
+            discount,
+            discountType
         },
         context => context.colCmp('id', '=', id),
         ['id'] as const,

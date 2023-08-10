@@ -6,6 +6,7 @@ type Error =
     | [205] /* at least one change is required */
     | [206] /* invalid lab id */
     | [207] /* invalid file uuid */
+    | [208] /* discount and discountType should be both defined or undefined */
     | [301] /* permission denied */
     | [302] /* product does not exist */
     | [401, unknown]
