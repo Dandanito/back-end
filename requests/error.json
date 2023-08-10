@@ -1,3 +1,9 @@
 {
-  "Null": {}
+  "Null": {},
+  "Log": {},
+  "Token": {},
+  "ProductGroup": {},
+  "Product": {},
+  "Order": {},
+  "User": {}
 }
