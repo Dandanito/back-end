@@ -1,18 +1,18 @@
 import Error from './error';
 import * as bcryptjs from 'bcryptjs';
-import { User, UserModel } from '../user/schema';
+import { Constants } from './constant';
 import { err, ok, Result } from 'never-catch';
+import { User, UserModel } from '../user/schema';
 import { Connection } from '../../utils/connection';
 import { Token, TOKEN_SECRET_LENGTH, TokenModel } from './schema';
-import { Constants } from './constant';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Crypto = require('crypto');
 
 const checkCredentialAndGetUserID = async (
     { client }: Omit<Connection, 'user'>,
     { emailAddress, phoneNumber, password }: UserModel<['password'], ['emailAddress', 'phoneNumber']>
-): Promise<Result<UserModel['id'], Error>> => {
-    const userResult = await User.select(['id', 'password'] as const, context =>
+): Promise<Result<UserModel<['id', 'role']>, Error>> => {
+    const userResult = await User.select(['id', 'password', 'role'] as const, context =>
         context.colsOr({
             phoneNumber: ['=', phoneNumber],
             emailAddress: ['=', emailAddress]
@@ -29,7 +29,7 @@ const checkCredentialAndGetUserID = async (
     if (!bcryptjs.compareSync(password, userResult.value.password)) {
         return err([302]);
     }
-    return ok(userResult.value.id);
+    return ok(userResult.value);
 };
 
 const removeExpiredTokensAndCountTheRest = async ({
@@ -87,8 +87,8 @@ const generateUniqueSecret = async ({
 
 const generateToken = async ({
                                  client
-                             }: Omit<Connection, 'user'>, userID: UserModel['id']): Promise<
-    Result<TokenModel<['userID', 'secret', 'createdAt', 'expireAt']>, Error>
+                             }: Omit<Connection, 'user'>, user: UserModel<['id', 'role']>): Promise<
+    Result<TokenModel<['userID', 'secret', 'createdAt', 'expireAt', 'role']>, Error>
     > => {
     const uniqueSecretResult = await generateUniqueSecret({ client });
     if (!uniqueSecretResult.ok) {
@@ -98,7 +98,8 @@ const generateToken = async ({
     const createdAt = new Date();
 
     return ok({
-        userID,
+        userID: user.id,
+        role: user.role,
         secret,
         createdAt,
         expireAt: new Date(createdAt.getTime() + Constants.TokenLife)

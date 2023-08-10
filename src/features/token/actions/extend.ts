@@ -33,11 +33,15 @@ const extend = async (
     }
     const userID = checkExpireAndRemainedTimeResult.value.userID;
     const tokenID = checkExpireAndRemainedTimeResult.value.id;
+    const role = checkExpireAndRemainedTimeResult.value.role;
 
     // extend
     const extendTokenResult = await extendToken(
         { client: connection.client },
-        userID,
+        {
+            id: userID,
+            role
+        },
         tokenID
     );
     if (!extendTokenResult.ok) {
@@ -60,10 +64,10 @@ const checkValidation = (
 const checkExpireAndRemainedTime = async (
     { client }: Omit<Connection, 'user'>,
     secret: TokenModel['secret']
-): Promise<Result<TokenModel<['id', 'userID']>, Error>> => {
+): Promise<Result<TokenModel<['id', 'userID', 'role']>, Error>> => {
     // get token
     const tokenResult = await Token.select(
-        ['id', 'userID', 'createdAt', 'expireAt'] as const,
+        ['id', 'userID', 'createdAt', 'expireAt', 'role'] as const,
         context => context.colCmp('secret', '=', secret)
     ).exec(client, ['get', 'one']);
     if (!tokenResult.ok) {
@@ -85,12 +89,12 @@ const checkExpireAndRemainedTime = async (
         return err([307]);
     }
 
-    return ok({ id: tokenResult.value.id, userID: tokenResult.value.userID });
+    return ok({ id: tokenResult.value.id, userID: tokenResult.value.userID, role: tokenResult.value.role });
 };
 
 const extendToken = async (
     { client }: Omit<Connection, 'user'>,
-    userID: UserModel['id'],
+    user: UserModel<['id', 'role']>,
     id: TokenModel['id']
 ): Promise<
     Result<
@@ -102,7 +106,7 @@ const extendToken = async (
         Error
         >
     > => {
-    const tokenResult = await generateToken({ client }, userID);
+    const tokenResult = await generateToken({ client }, user);
     if (!tokenResult.ok) {
         return tokenResult;
     }

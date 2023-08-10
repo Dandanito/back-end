@@ -30,7 +30,7 @@ const login = async (
     if (!checkCredentialAndGetUserIDResult.ok) {
         return checkCredentialAndGetUserIDResult;
     }
-    const userID = checkCredentialAndGetUserIDResult.value;
+    const userID = checkCredentialAndGetUserIDResult.value.id;
 
     // current tokens
     const removeExpiredTokensAndCountTheRestResult =
@@ -50,7 +50,7 @@ const login = async (
     // add token
     const addTokenResult = await addToken({
         client: connection.client
-    }, userID);
+    }, checkCredentialAndGetUserIDResult.value);
     if (!addTokenResult.ok) {
         return addTokenResult;
     }
@@ -82,16 +82,16 @@ const checkValidation = (
 
 const addToken = async ({
                             client
-                        }: Omit<Connection, 'user'>, userID: UserModel['id']): Promise<Result<TokenModel<['id', 'userID', 'secret', 'createdAt', 'expireAt']>,
+                        }: Omit<Connection, 'user'>, user: UserModel<['id', 'role']>): Promise<Result<TokenModel<['id', 'userID', 'secret', 'createdAt', 'expireAt', 'role']>,
     Error>> => {
-    const tokenResult = await generateToken({ client }, userID);
+    const tokenResult = await generateToken({ client }, user);
     if (!tokenResult.ok) {
         return tokenResult;
     }
 
     const addTokenResult = await Token.insert(
         [tokenResult.value],
-        ['id', 'userID', 'secret', 'createdAt', 'expireAt'] as const,
+        ['id', 'userID', 'secret', 'createdAt', 'expireAt', 'role'] as const,
         { nullableDefaultColumns: ['createdAt'] as const }
     ).exec(client, ['get', 'one']);
     if (!addTokenResult.ok) {
