@@ -1,7 +1,7 @@
 const Role = {
-    Admin: 'admin',
-    Laboratory: 'laboratory',
-    Customer: 'customer'
+    Admin: 1,
+    Laboratory: 2,
+    Customer: 3
 } as const;
 
 export { Role };

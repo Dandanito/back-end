@@ -81,9 +81,10 @@ const UserTable = {
             nullable: false
         },
         role: {
-            type: 'character varying',
+            type: 'smallint',
             default: false,
-            nullable: false
+            nullable: false,
+            max: 3
         }
     }
 } as const;
