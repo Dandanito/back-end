@@ -49,6 +49,17 @@ const ProductTable = {
             type: 'jsonb',
             default: false,
             nullable: false
+        },
+        discount: {
+            type: 'bigint',
+            default: false,
+            nullable: false
+        },
+        discountType: {
+            type: 'smallint',
+            default: false,
+            nullable: false,
+            max: 2
         }
     }
 } as const;
@@ -62,7 +73,9 @@ type ProductModel<R extends readonly (keyof (typeof ProductTable)['columns'])[] 
     'vote',
     'voteCount',
     'price',
-    'fileUUIDs'
+    'fileUUIDs',
+    'discount',
+    'discountType'
 ],
     O extends readonly (keyof (typeof ProductTable)['columns'])[] = []> = Model<(typeof ProductTable)['columns'], R, O>;
 const ProductModel = createModelUtils(Product.table.columns);
