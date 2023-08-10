@@ -5,6 +5,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "dev": "node --max-old-space-size=4096 node_modules/webpack/bin/webpack.js --config dev.webpack.config.js",
+    "prd": "node --max-old-space-size=4096 node_modules/webpack/bin/webpack.js --config prd.webpack.config.js",
     "build": "tsc"
   },
   "keywords": [],
