@@ -6,7 +6,7 @@ import { Connection } from '../../../utils/connection';
 const verify = async (
     { client }: Omit<Connection, 'user'>,
     secret: TokenModel['secret']
-): Promise<Result<TokenModel<['userID']>, Error>> => {
+): Promise<Result<TokenModel<['userID', 'role']>, Error>> => {
     // validation
     if (!TokenModel.secret.Validate(secret)) {
         return err([203]);
@@ -14,7 +14,7 @@ const verify = async (
 
     // verify secret
     const tokenResult = await Token.select(
-        ['userID', 'expireAt'] as const,
+        ['userID', 'role', 'expireAt'] as const,
         context => context.colCmp('secret', '=', secret)
     ).exec(client, ['get', 'one']);
     if (!tokenResult.ok) {
@@ -27,7 +27,7 @@ const verify = async (
         return err([308]);
     }
 
-    return ok({ userID: tokenResult.value.userID });
+    return ok({ userID: tokenResult.value.userID, role: tokenResult.value.role });
 };
 
 export default verify;

@@ -43,6 +43,12 @@ const TokenTable = {
             minLength: TOKEN_SECRET_LENGTH,
             maxLength: TOKEN_SECRET_LENGTH,
             regex: EnglishNumberSignsRegex
+        },
+        role: {
+            type: 'smallint',
+            default: false,
+            nullable: false,
+            max: 3
         }
     }
 } as const;
@@ -53,7 +59,8 @@ type TokenModel<
         'userID',
         'createdAt',
         'expireAt',
-        'secret'
+        'secret',
+        'role'
     ],
     O extends readonly (keyof (typeof TokenTable)['columns'])[] = []
     > = Model<(typeof TokenTable)['columns'], R, O>;
