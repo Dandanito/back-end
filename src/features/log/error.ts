@@ -1,3 +1,3 @@
-type Error = [401, unknown];
+type Error = [401, unknown]; /* db error */
 
-export type { Error };
+export default Error;

@@ -1,4 +1,3 @@
-import { EnglishNumberSignsRegex } from '../../utils/regexes';
 import { createEntity, createModelUtils, Model } from '@mrnafisia/type-query';
 
 const LogTable = {
@@ -7,58 +6,52 @@ const LogTable = {
     columns: {
         id: {
             type: 'bigint',
-            nullable: false,
             default: 'auto-increment',
+            nullable: false,
             primary: true
         },
         api: {
             type: 'character varying',
-            nullable: false,
             default: false,
+            nullable: false,
             minLength: 2,
-            maxLength: 60,
-            regex: EnglishNumberSignsRegex
+            maxLength: 60
         },
         headers: {
             type: 'character varying',
-            nullable: false,
-            default: false
+            default: false,
+            nullable: false
         },
         body: {
             type: 'character varying',
-            nullable: false,
-            default: false
+            default: false,
+            nullable: false
         },
         response: {
             type: 'character varying',
-            nullable: false,
-            default: false
+            default: false,
+            nullable: false
         },
-        receivedAt: {
+        createdAt: {
             type: 'timestamp with time zone',
+            default: 'created-at',
             nullable: false,
-            default: false
-        },
-        respondedAt: {
-            type: 'timestamp with time zone',
-            nullable: false,
-            default: false
+            title: 'created_at'
         }
     }
 } as const;
 const Log = createEntity(LogTable);
 type LogModel<
-    R extends readonly (keyof (typeof LogTable)['columns'])[] = [
+    R extends readonly (keyof typeof LogTable['columns'])[] = [
         'id',
         'api',
         'headers',
         'body',
         'response',
-        'receivedAt',
-        'respondedAt'
+        'createdAt'
     ],
-    O extends readonly (keyof (typeof LogTable)['columns'])[] = []
-> = Model<(typeof LogTable)['columns'], R, O>;
+    O extends readonly (keyof typeof LogTable['columns'])[] = []
+> = Model<typeof LogTable['columns'], R, O>;
 const LogModel = createModelUtils(Log.table.columns);
 
 export { Log, LogModel };

@@ -1,15 +1,23 @@
-import { Error } from '../error';
-import { err, Result } from 'never-catch';
+import Error from '../error';
 import { Log, LogModel } from '../schema';
+import { err, ok, Result } from 'never-catch';
 import { Connection } from '../../../utils/connection';
 
-const addLog = (
+const addLog = async (
     { client }: Omit<Connection, 'user'>,
-    log: LogModel<['api', 'headers', 'body', 'response', 'receivedAt', 'respondedAt'],
-        ['id']>
-): Promise<Result<{ id: LogModel['id'] }, Error>> =>
-    Log.insert([log], ['id'] as const)
-        .exec(client, ['get', 'one'])
-        .then(result => (result.ok ? result : err([401, result.error])));
+    log: LogModel<['api', 'headers', 'body', 'response'], ['id', 'createdAt']>
+): Promise<Result<{ id: LogModel['id'] }, Error>> => {
+    const addLogResult = await Log.insert(
+        [log],
+        ['id'] as const
+    ).exec(client, ['get', 'one']);
+    if (!addLogResult.ok){
+        return err([401, addLogResult]);
+    }
 
-export { addLog };
+    return ok(addLogResult.value);
+}
+
+
+
+export default addLog;
