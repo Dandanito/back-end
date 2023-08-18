@@ -5,6 +5,8 @@ type Error =
     | [301] /* permission denied */
     | [302] /* lab does not exist */
     | [303] /* product does not exist */
+    | [304] /* order does not exist */
+    | [305] /* order is not editable */
     | [401, unknown]
 
 export default Error;

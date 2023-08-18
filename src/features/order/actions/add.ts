@@ -58,6 +58,7 @@ const add = async (
     // check product existence
     const checkProductExistenceResult = await checkProductExistence(
         connection,
+        labID,
         productIDs
     );
     if (!checkProductExistenceResult.ok) {
@@ -82,13 +83,11 @@ const add = async (
         [
             {
                 labID,
-                productIDs: productIDs.map(e => e.toString()),
                 status: Status.Draft,
                 customerID: connection.user.id,
                 description,
                 date: new Date(),
-                price: totalPrice,
-                data
+                price: totalPrice
             }
         ],
         ['id'] as const
