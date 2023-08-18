@@ -1,6 +1,6 @@
 import { Error } from '../error';
 import { v4 as uuid } from 'uuid';
-import path, { join } from 'path';
+import path from 'path';
 import { Constants } from '../constant';
 import { isBinaryFile } from 'isbinaryfile';
 import { File, FileModel } from '../schema';
@@ -20,25 +20,24 @@ const upload = async (
     if (!checkLimitsAndGetFileTypeResult.ok) {
         return checkLimitsAndGetFileTypeResult;
     }
-    const { extension, mimeType } = checkLimitsAndGetFileTypeResult.value;
+    const { extension } = checkLimitsAndGetFileTypeResult.value;
 
     // add
     const addFileResult = await addFile(connection, {
         size: file.size,
         name: decodeURIComponent(file.name),
-        extension,
-        mimeType
+        extension
     });
     if (!addFileResult.ok) {
         return addFileResult;
     }
     const {
-        file: { id, uuid }
+        file: { uuid }
     } = addFileResult.value;
 
     // move
     const moveResult: Result<undefined, Error> = await file
-        .mv(join(Constants.FILES_DIR, `${id}_${uuid}`))
+        .mv('/public')
         .then(() => ok(undefined))
         .catch(error => err([402, JSON.stringify(error)]));
     if (!moveResult.ok) {
@@ -104,8 +103,8 @@ const doesExtensionsMatch = (
 
 const addFile = async (
     { client }: Omit<Connection, 'user'>,
-    file: FileModel<['size', 'name', 'extension', 'mimeType']>
-): Promise<Result<{ file: FileModel<['id', 'uuid']>; }, Error>> => {
+    file: FileModel<['size', 'name', 'extension']>
+): Promise<Result<{ file: FileModel<['uuid']>; }, Error>> => {
     const addingFile = {
         ...file,
         uuid: uuid(),
@@ -113,7 +112,6 @@ const addFile = async (
         createdAt: new Date()
     };
     const result = await File.insert([addingFile], [
-        'id',
         'uuid'
     ] as const).exec(client, ['get', 'one']);
     if (!result.ok) {

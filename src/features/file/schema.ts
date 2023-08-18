@@ -3,28 +3,16 @@ import {
     createEntity,
     createModelUtils,
     Model,
-    Parser
+    Parser, Table
 } from '@mrnafisia/type-query';
 
-const FileTable = {
+const FileTable: Table = {
     schema: 'general',
     title: 'file',
     columns: {
-        id: {
-            type: 'bigint',
-            nullable: false,
-            default: 'auto-increment',
-            primary: true
-        },
         uuid: {
             type: 'uuid',
-            nullable: false,
-            default: false,
-            minLength: 36,
-            maxLength: 36
-        },
-        isTemp: {
-            type: 'boolean',
+            primary: true,
             nullable: false,
             default: false
         },
@@ -47,32 +35,16 @@ const FileTable = {
             default: false,
             minLength: 1,
             maxLength: 10
-        },
-        mimeType: {
-            type: 'character varying',
-            nullable: false,
-            default: false,
-            minLength: 1,
-            maxLength: 100
-        },
-        createdAt: {
-            type: 'timestamp with time zone',
-            nullable: false,
-            default: false
         }
     }
 } as const;
 const File = createEntity(FileTable);
 type FileModel<
     R extends readonly (keyof (typeof FileTable)['columns'])[] = [
-        'id',
         'uuid',
-        'isTemp',
         'size',
         'name',
-        'extension',
-        'mimeType',
-        'createdAt'
+        'extension'
     ],
     O extends readonly (keyof (typeof FileTable)['columns'])[] = []
 > = Model<(typeof FileTable)['columns'], R, O>;

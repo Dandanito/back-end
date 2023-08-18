@@ -16,6 +16,8 @@ app.use(fileUpload({
     tempFileDir: '/tmp/'
 }));
 
+app.use(express.static('/public'));
+
 // features
 
 app.listen(port, () => console.log(`dandanito listening on ${port}`));
