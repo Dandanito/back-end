@@ -1,4 +1,4 @@
-import { Error } from '../error';
+import Error from '../error';
 import { v4 as uuid } from 'uuid';
 import path from 'path';
 import { Constants } from '../constant';
