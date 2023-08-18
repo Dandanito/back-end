@@ -6,8 +6,6 @@ import { Order } from '../src/features/order/schema';
 
 import { Product } from '../src/features/product/schema';
 
-import { ProductGroup } from '../src/features/product-group/schema';
-
 import { Token } from '../src/features/token/schema';
 
 import { User } from '../src/features/user/schema';
@@ -21,7 +19,6 @@ const pool = createPool(connectionUrl);
         Log.table,
         Order.table,
         Product.table,
-        ProductGroup.table,
         Token.table,
         User.table
     ]);
