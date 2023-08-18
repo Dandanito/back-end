@@ -1,6 +1,5 @@
 import Error from '../error';
 import { getProduct } from '../utils';
-import { moveFiles } from '../../file/util';
 import { FileModel } from '../../file/schema';
 import { err, ok, Result } from 'never-catch';
 import { Product, ProductModel } from '../schema';
@@ -72,49 +71,13 @@ const edit = async (
             discountType
         },
         context => context.colCmp('id', '=', id),
-        ['id'] as const,
+        ['id', 'title', 'description'] as const,
         {
             ignoreInSets: true
         }
     ).exec(connection.client, ['get', 'one']);
     if (!editProductResult.ok) {
         return err([401, editProductResult]);
-    }
-
-    // file
-    if (fileUUIDs !== undefined) {
-        const attachingFileUUIDs: FileModel['uuid'][] = [];
-        const removingFileUUIDs: FileModel['uuid'][] = [];
-        for (const fileUUID of fileUUIDs){
-            if (!getProductResult.value.fileUUIDs.includes(fileUUID)){
-                attachingFileUUIDs.push(fileUUID)
-            }
-        }
-        for (const fileUUID of getProductResult.value.fileUUIDs){
-            if (!fileUUIDs.includes(fileUUID)){
-                removingFileUUIDs.push(fileUUID)
-            }
-        }
-        if (attachingFileUUIDs.length !== 0) {
-            const moveFilesResult = await moveFiles(
-                connection,
-                attachingFileUUIDs,
-                'attach'
-            );
-            if (!moveFilesResult.ok) {
-                return err([401, moveFilesResult]);
-            }
-        }
-        if (removingFileUUIDs.length !== 0) {
-            const moveFilesResult = await moveFiles(
-                connection,
-                removingFileUUIDs,
-                'remove'
-            );
-            if (!moveFilesResult.ok) {
-                return err([401, moveFilesResult]);
-            }
-        }
     }
 
     return ok({

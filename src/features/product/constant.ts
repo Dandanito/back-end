@@ -4,4 +4,13 @@ const DiscountType = {
     Amount: 3
 } as const;
 
-export { DiscountType };
+const ProductGroup = {
+    Orthodontic: 1,
+    Prosthesis: 2,
+    Surgery: 3,
+    Repair: 4,
+    Periodontal: 5,
+    OralDiseases: 6
+} as const
+
+export { DiscountType, ProductGroup };

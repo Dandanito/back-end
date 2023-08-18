@@ -23,6 +23,12 @@ const ProductTable = {
             default: false,
             maxLength: 300
         },
+        productGroup: {
+            type: 'smallint',
+            nullable: false,
+            default: false,
+            max: 6
+        },
         labID: {
             type: 'integer',
             nullable: false,
@@ -69,6 +75,7 @@ type ProductModel<R extends readonly (keyof (typeof ProductTable)['columns'])[] 
     'id',
     'title',
     'description',
+    'productGroup',
     'labID',
     'vote',
     'voteCount',
