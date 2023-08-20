@@ -71,7 +71,6 @@ const add = async (
             product.price - product.discount :
             product.price * product.discount / BigInt(100);
         data.push({
-            productID: product.id,
             price: product.price,
             discountType: product.discountType,
             discount: product.discount
@@ -95,6 +94,8 @@ const add = async (
     if (!addOrderResult.ok) {
         return err([401, addOrderResult.error]);
     }
+
+    // TODO Order rows
 
     return ok({
         id: addOrderResult.value.id

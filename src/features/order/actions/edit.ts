@@ -1,12 +1,11 @@
 import Error from '../error';
-import { OrderModel, OrderRow, OrderRowModel } from '../schema';
+import { Status } from '../constant';
 import { err, ok, Result } from 'never-catch';
 import { ProductModel } from '../../product/schema';
+import { Expression, U } from '@mrnafisia/type-query';
 import { Connection } from '../../../utils/connection';
-import { checkOrderExistence, checkProductExistence } from '../util';
-import { Status } from '../constant';
-import { constants } from 'http2';
-import HTTP2_HEADER_IF_MATCH = module;
+import { OrderModel, OrderRow, OrderRowModel } from '../schema';
+import { addOrderRow, checkOrderExistence, checkProductExistence } from '../util';
 
 const edit = async (
     connection: Connection,
@@ -54,6 +53,11 @@ const edit = async (
         if (!checkProductExistenceResult.ok) {
             return checkProductExistenceResult;
         }
+
+        const addOrderRowResult = await addOrderRow(
+            connection,
+
+        )
     }
 
     if (editOrderRows !== undefined || removeProductIDs !== undefined) {
@@ -66,23 +70,49 @@ const edit = async (
         }
 
         if (editOrderRows !== undefined) {
-            if (editOrderRows.map(e => e.productID).some(e => !getOrderRowsResult.value.map(e => e.productID).includes(e))){
-                return err([])
-            }
-
-            for (const { productID, count } of editOrderRows){
+            const countSwt: {
+                when: Expression<boolean>;
+                then: Expression<number>;
+            }[] = [];
+            for (const { productID, count } of editOrderRows) {
                 const correspondingRow = getOrderRowsResult.value.find(e => e.productID === productID);
-                if (correspondingRow === undefined){
-                    return err([401, 'corresponding row undefined'])
+                if (correspondingRow === undefined) {
+                    return err([303]);
                 }
-                totalPrice -= BigInt(count - correspondingRow.count) * correspondingRow.price
+                totalPrice += BigInt(count - correspondingRow.count) * correspondingRow.price;
+                countSwt.push({
+                    when: OrderRow.context.colCmp('productID', '=', productID),
+                    then: count
+                });
+            }
+
+            const editOrderRowsResult = await editOrderRow(
+                connection,
+                editOrderRows.map(e => e.productID),
+                countSwt
+            );
+            if (!editOrderRowsResult.ok){
+                return editOrderRowsResult
             }
         }
 
-        if (removeProductIDs !== undefined){
-            
-        }
+        if (removeProductIDs !== undefined) {
+            for (const productID of removeProductIDs) {
+                const correspondingRow = getOrderRowsResult.value.find(e => e.productID === productID);
+                if (correspondingRow === undefined) {
+                    return err([304]);
+                }
+                totalPrice -= correspondingRow.price;
+            }
 
+            const removeOrderRowResult = await removeOrderRow(
+                connection,
+                removeProductIDs
+            );
+            if (!removeOrderRowResult.ok){
+                return removeOrderRowResult;
+            }
+        }
     }
 
 
@@ -102,3 +132,39 @@ const getOrderRows = async (
 
     return ok(getOrderRowsResult.value);
 };
+
+const editOrderRow = async (
+    { client }: Omit<Connection, 'user'>,
+    productIDs: OrderRowModel['productID'][],
+    balanceSwt: {
+        when: Expression<boolean>;
+        then: Expression<number>;
+    }[] = []
+): Promise<Result<undefined, Error>> => {
+    const editOrderRowsResult = await OrderRow.update({
+            count: U.swt(balanceSwt, OrderRow.context.col('count'))
+        },
+        context => context.colList('productID', 'in', productIDs),
+        ['id'] as const
+    ).exec(client, ['get', productIDs.length]);
+    if (!editOrderRowsResult.ok){
+        return err([401, editOrderRowsResult.error])
+    }
+
+    return ok(undefined)
+};
+
+const removeOrderRow = async (
+    { client }: Omit<Connection, 'user'>,
+    productIDs: OrderRowModel['productID'][]
+): Promise<Result<undefined, Error>> => {
+    const removeOrderRowResult = await OrderRow.delete(
+        context => context.colList('productID', 'in', productIDs),
+        ['id'] as const
+    ).exec(client, ['get', productIDs.length]);
+    if (!removeOrderRowResult.ok){
+        return err([401, removeOrderRowResult.error])
+    }
+
+    return ok(undefined)
+}

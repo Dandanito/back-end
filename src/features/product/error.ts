@@ -9,6 +9,8 @@ type Error =
     | [208] /* discount and discountType should be both defined or undefined */
     | [301] /* permission denied */
     | [302] /* product does not exist */
+    | [303] /* edit order row does not exist */
+    | [304] /* edit order row does not exist */
     | [401, unknown]
 
 export default Error;
