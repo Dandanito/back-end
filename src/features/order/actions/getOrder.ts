@@ -1,12 +1,12 @@
+import { Order } from '../schema';
+import { OrderModel } from '../schema';
+import Error from '../../product/error';
+import { err, ok, Result } from 'never-catch';
+import { Context, U } from '@mrnafisia/type-query';
 import { Connection } from '../../../utils/connection';
 import { GetOptions } from '../../../utils/getOptions';
-import { OrderModel } from '../schema';
-import { err, ok, Result } from 'never-catch';
-import Error from '../../product/error';
-import { Order } from '../schema';
-import { Context, U } from '@mrnafisia/type-query';
 
-const get = async (
+const getOrder = async (
     connection: Connection,
     { start, step, orders }: GetOptions<(typeof Order.table)['columns']>,
     filters: {
@@ -92,4 +92,4 @@ const get = async (
     });
 }
 
-export default get
+export default getOrder
