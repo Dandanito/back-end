@@ -15,59 +15,7 @@ const get = async (
         labIDs?: ProductModel['labID'][]
         prices?: ProductModel['price'][][]
     }
-): Promise<Result<{ result: ProductModel<['id', 'title']>[]; length: number }, Error>> => {
-    // id
-    if (filters.ids !== undefined) {
-        for (const id of filters.ids) {
-            if (!ProductModel.id.Validate(id)) {
-                return err([204]);
-            }
-        }
-    }
-    // title
-    if (filters.titles !== undefined) {
-        for (const title of filters.titles) {
-            if (!ProductModel.title.Validate(title)) {
-                return err([201]);
-            }
-        }
-    }
-    // description
-    if (filters.descriptions !== undefined) {
-        for (const description of filters.descriptions) {
-            if (!ProductModel.description.Validate(description)) {
-                return err([202]);
-            }
-        }
-    }
-    // labID
-    if (filters.labIDs !== undefined) {
-        for (const labID of filters.labIDs) {
-            if (!ProductModel.labID.Validate(labID)) {
-                return err([206]);
-            }
-        }
-    }
-    // price
-    if (filters.prices !== undefined) {
-        for (const priceArray of filters.prices) {
-            if (priceArray.length === 1) {
-                if (!ProductModel.price.Validate(priceArray[0])) {
-                    return err([203]);
-                }
-            } else if (priceArray.length === 2) {
-                if (
-                    !ProductModel.price.Validate(priceArray[0]) ||
-                    !ProductModel.price.Validate(priceArray[1])
-                ) {
-                    return err([203]);
-                }
-            } else {
-                return err([203]);
-            }
-        }
-    }
-
+): Promise<Result<{ result: ProductModel<['id', 'title', 'description', 'vote', 'voteCount', 'labID', 'price']>[]; length: number }, Error>> => {
     // get
     const where = (context: Context<typeof Product.table['columns']>) =>
         U.andAllOp([
