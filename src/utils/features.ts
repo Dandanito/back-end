@@ -2,10 +2,10 @@ const FEATURES = {
     Null: 'Null',
     Log: 'Log',
     Token: 'Token',
-    ProductGroup: 'ProductGroup',
     Product: 'Product',
     Order: 'Order',
-    User: 'User'
+    User: 'User',
+    File: 'File'
 } as const;
 
 export { FEATURES }
