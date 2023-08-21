@@ -3,10 +3,10 @@ import {
     createEntity,
     createModelUtils,
     Model,
-    Parser, Table
+    Parser
 } from '@mrnafisia/type-query';
 
-const FileTable: Table = {
+const FileTable = {
     schema: 'general',
     title: 'file',
     columns: {
