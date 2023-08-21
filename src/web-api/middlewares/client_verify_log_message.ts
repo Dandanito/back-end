@@ -8,10 +8,10 @@ import { Connection } from '../../utils/connection';
 import evalClientData from '../utils/evalClientData';
 import verify from '../../features/token/actions/verify';
 import { TokenModel } from '../../features/token/schema';
-
 const client_verify_log_message =
     (
         api: string,
+        roles: number[],
         action: (
             req: Request,
             res: Response,
@@ -51,6 +51,14 @@ const client_verify_log_message =
                         code,
                         data
                     });
+                }
+
+                if (!roles.includes(verifyResult.value.role)){
+                    return err({
+                        feature: FEATURES.User,
+                        code: 301,
+                        data: 'user is not in the required role'
+                    })
                 }
 
                 // action
