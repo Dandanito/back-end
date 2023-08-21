@@ -4,8 +4,9 @@ import { err, ok, Result } from 'never-catch';
 import { ProductModel } from '../../product/schema';
 import { Expression, U } from '@mrnafisia/type-query';
 import { Connection } from '../../../utils/connection';
-import { OrderModel, OrderRow, OrderRowModel } from '../schema';
+import { Order, OrderModel, OrderRow, OrderRowModel } from '../schema';
 import { addOrderRow, checkOrderExistence, checkProductExistence } from '../util';
+import { DiscountType } from '../../product/constant';
 
 const edit = async (
     connection: Connection,
@@ -19,7 +20,7 @@ const edit = async (
         addProductIDs !== undefined &&
         editOrderRows !== undefined &&
         removeProductIDs !== undefined) {
-        return err([]);
+        return err([204]);
     }
 
     // check order existence
@@ -53,11 +54,31 @@ const edit = async (
         if (!checkProductExistenceResult.ok) {
             return checkProductExistenceResult;
         }
+        const orderRows: OrderRowModel<['productID', 'orderID', 'price', 'discount', 'discountType', 'count']>[] = [];
+        for (const { productID, count } of addProductIDs) {
+            const correspondingRow = checkProductExistenceResult.value.find(e => e.id === productID);
+            if (correspondingRow === undefined) {
+                return err([401, 'corresponding row not found']);
+            }
+            const price = correspondingRow.discountType === DiscountType.Amount ? correspondingRow.price - correspondingRow.discount :
+                correspondingRow.price - (correspondingRow.price * correspondingRow.discount / BigInt(100));
+            totalPrice += price;
+            orderRows.push({
+                ...correspondingRow,
+                orderID: id,
+                price,
+                productID,
+                count
+            });
+        }
 
         const addOrderRowResult = await addOrderRow(
             connection,
-
-        )
+            orderRows
+        );
+        if (!addOrderRowResult.ok) {
+            return addOrderRowResult;
+        }
     }
 
     if (editOrderRows !== undefined || removeProductIDs !== undefined) {
@@ -91,8 +112,8 @@ const edit = async (
                 editOrderRows.map(e => e.productID),
                 countSwt
             );
-            if (!editOrderRowsResult.ok){
-                return editOrderRowsResult
+            if (!editOrderRowsResult.ok) {
+                return editOrderRowsResult;
             }
         }
 
@@ -109,13 +130,20 @@ const edit = async (
                 connection,
                 removeProductIDs
             );
-            if (!removeOrderRowResult.ok){
+            if (!removeOrderRowResult.ok) {
                 return removeOrderRowResult;
             }
         }
     }
 
-
+    return  await editOrder(
+        connection,
+        {
+            id,
+            description,
+            price: totalPrice
+        }
+    );
 };
 
 const getOrderRows = async (
@@ -147,11 +175,11 @@ const editOrderRow = async (
         context => context.colList('productID', 'in', productIDs),
         ['id'] as const
     ).exec(client, ['get', productIDs.length]);
-    if (!editOrderRowsResult.ok){
-        return err([401, editOrderRowsResult.error])
+    if (!editOrderRowsResult.ok) {
+        return err([401, editOrderRowsResult.error]);
     }
 
-    return ok(undefined)
+    return ok(undefined);
 };
 
 const removeOrderRow = async (
@@ -162,9 +190,33 @@ const removeOrderRow = async (
         context => context.colList('productID', 'in', productIDs),
         ['id'] as const
     ).exec(client, ['get', productIDs.length]);
-    if (!removeOrderRowResult.ok){
-        return err([401, removeOrderRowResult.error])
+    if (!removeOrderRowResult.ok) {
+        return err([401, removeOrderRowResult.error]);
     }
 
-    return ok(undefined)
-}
+    return ok(undefined);
+};
+
+const editOrder = async (
+    { client }: Omit<Connection, 'user'>,
+    { id, description, price }: OrderModel<['id'], ['description', 'price']>
+): Promise<Result<OrderModel['id'], Error>> => {
+    const editOrderResult = await Order.update({
+            description,
+            price
+        },
+        context => context.colCmp('id', '=', id),
+        ['id'] as const,
+        {
+            ignoreInSets: true
+        }
+    ).exec(client, ['get', 'one']);
+    if (!editOrderResult.ok) {
+        return err([401, editOrderResult.error]);
+    }
+
+    return ok(editOrderResult.value.id);
+};
+
+
+export default edit;

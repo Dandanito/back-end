@@ -27,7 +27,7 @@ const checkProductExistence = async (
 
 const addOrderRow = async (
     { client }: Omit<Connection, 'user'>,
-    orderRows: OrderRowModel<['productID', 'price', 'discount', 'discountType', 'count']>[]
+    orderRows: OrderRowModel<['productID', 'orderID', 'price', 'discount', 'discountType', 'count']>[]
 ): Promise<Result<OrderRowModel['id'][], Error>> => {
     const addOrderRowResult = await OrderRow.insert(
         orderRows,
