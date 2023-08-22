@@ -21,7 +21,7 @@ const client_log_message =
                     feature: keyof typeof FEATURES | null;
                     code: number;
                     data?: unknown;
-                    userID: UserModel['id'];
+                    userID?: UserModel['id'];
                 },
                 {
                     feature: keyof typeof FEATURES | null;

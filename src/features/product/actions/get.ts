@@ -6,7 +6,7 @@ import { Connection } from '../../../utils/connection';
 import { GetOptions } from '../../../utils/getOptions';
 
 const get = async (
-    connection: Connection,
+    client: Connection['client'],
     { start, step, orders }: GetOptions<(typeof Product.table)['columns']>,
     filters: {
         ids?: ProductModel['id'][],
@@ -46,7 +46,7 @@ const get = async (
             step: step !== undefined ? step : 25,
             orders: orders !== undefined ? orders : [{ by: 'id', direction: 'desc' }]
         }
-    ).exec(connection.client, []);
+    ).exec(client, []);
     if (!getProductsResult.ok) {
         return err([401, getProductsResult.error]);
     }
@@ -65,7 +65,7 @@ const get = async (
             ] as const,
         where,
         { ignoreInWhere: true }
-    ).exec(connection.client, ['get', 'one']);
+    ).exec(client, ['get', 'one']);
     if (!lengthResult.ok) {
         return err([401, lengthResult.error]);
     }

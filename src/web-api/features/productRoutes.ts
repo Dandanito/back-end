@@ -4,10 +4,14 @@ import { FEATURES } from '../../utils/features';
 import { Role } from '../../features/user/roles';
 import add from '../../features/product/actions/add';
 import { FileModel } from '../../features/file/schema';
-import { ProductModel } from '../../features/product/schema';
-import client_verify_log_message from '../middlewares/client_verify_log_message';
 import edit from '../../features/product/actions/edit';
 import remove from '../../features/product/actions/remove';
+import { Product, ProductModel } from '../../features/product/schema';
+import client_log_message from '../middlewares/client_log_message';
+import client_verify_log_message from '../middlewares/client_verify_log_message';
+import ParseGetOptions from '../utils/parseGetOptions';
+import { Parser } from '@mrnafisia/type-query';
+import get from '../../features/product/actions/get';
 
 const ProductRoute = '/product';
 
@@ -46,7 +50,7 @@ const product = (app: Express) => {
                     });
                 }
                 for (const fileUUID of req.body.fileUUIDs) {
-                    const parsed = FileModel.uuid.Parse(fileUUID);
+                    const parsed = FileModel.uuid.Parse(fileUUID, true);
                     if (parsed === undefined) {
                         return err({
                             feature: FEATURES.Product,
@@ -118,7 +122,7 @@ const product = (app: Express) => {
                         });
                     }
                     for (const fileUUID of req.body.fileUUIDs) {
-                        const parsed = FileModel.uuid.Parse(fileUUID);
+                        const parsed = FileModel.uuid.Parse(fileUUID, true);
                         if (parsed === undefined) {
                             return err({
                                 feature: FEATURES.Product,
@@ -161,7 +165,7 @@ const product = (app: Express) => {
             ProductRoute + ':add',
             [Role.Admin, Role.Laboratory],
             async (req, _res, connection) => {
-                const id = ProductModel.id.Parse(req.body.id);
+                const id = ProductModel.id.Parse(req.body.id, true);
                 if (id === undefined) {
                     return err({
                         feature: FEATURES.Product,
@@ -189,6 +193,181 @@ const product = (app: Express) => {
                         id: actionResult.value.id
                     }
                 });
+            }
+        )
+    );
+    app.get(
+        ProductRoute,
+        client_log_message(
+            ProductRoute + ':get',
+            async (req, _res, client) => {
+                let ids: ProductModel['id'][] | undefined;
+                let titles: ProductModel['title'][] | undefined;
+                let descriptions: ProductModel['description'][] | undefined;
+                let labIDs: ProductModel['labID'][] | undefined;
+                let prices: ProductModel['price'][][] | undefined;
+
+                const options = ParseGetOptions(
+                    Product.table,
+                    req.query.start,
+                    req.query.step,
+                    Parser.json(req.query.orders)
+                );
+                if (options === undefined) {
+                    return err({
+                        feature: FEATURES.Product,
+                        code: 107
+                    });
+                }
+
+                if (req.query.ids !== undefined) {
+                    const queryIDs = Parser.json(req.query.ids);
+                    ids = [];
+                    if (!Array.isArray(queryIDs)) {
+                        return err({
+                            feature: FEATURES.Product,
+                            code: 212
+                        });
+                    }
+                    for (let i = 0; i < queryIDs.length; i++) {
+                        const parsed = ProductModel.id.Parse(queryIDs[i], true);
+                        if (parsed === undefined) {
+                            return err({
+                                feature: FEATURES.Product,
+                                code: 212
+                            });
+                        }
+                        ids.push(parsed);
+                    }
+                }
+
+                if (req.query.titles !== undefined) {
+                    const queryTitles = Parser.json(req.query.titles);
+                    titles = [];
+                    if (!Array.isArray(queryTitles)) {
+                        return err({
+                            feature: FEATURES.Product,
+                            code: 201
+                        });
+                    }
+                    for (let i = 0; i < queryTitles.length; i++) {
+                        const parsed = ProductModel.title.Parse(queryTitles[i], true);
+                        if (parsed === undefined) {
+                            return err({
+                                feature: FEATURES.Product,
+                                code: 201
+                            });
+                        }
+                        titles.push(parsed);
+                    }
+                }
+
+                if (req.query.descriptions !== undefined) {
+                    const queryDescriptions = Parser.json(req.query.descriptions);
+                    descriptions = [];
+                    if (!Array.isArray(queryDescriptions)) {
+                        return err({
+                            feature: FEATURES.Product,
+                            code: 202
+                        });
+                    }
+                    for (let i = 0; i < queryDescriptions.length; i++) {
+                        const parsed = ProductModel.description.Parse(queryDescriptions[i], true);
+                        if (parsed === undefined) {
+                            return err({
+                                feature: FEATURES.Product,
+                                code: 202
+                            });
+                        }
+                        descriptions.push(parsed);
+                    }
+                }
+
+                if (req.query.labIDs !== undefined) {
+                    const queryLabIDs = Parser.json(req.query.labIDs);
+                    labIDs = [];
+                    if (!Array.isArray(queryLabIDs)) {
+                        return err({
+                            feature: FEATURES.Product,
+                            code: 206
+                        });
+                    }
+                    for (let i = 0; i < queryLabIDs.length; i++) {
+                        const parsed = ProductModel.labID.Parse(queryLabIDs[i], true);
+                        if (parsed === undefined) {
+                            return err({
+                                feature: FEATURES.Product,
+                                code: 206
+                            });
+                        }
+                        labIDs.push(parsed);
+                    }
+                }
+
+                if (req.query.price !== undefined) {
+                    const queryPrices = Parser.json(
+                        req.query.price
+                    );
+                    prices = [];
+                    if (!Array.isArray(queryPrices)) {
+                        return err({
+                            feature: FEATURES.Product,
+                            code: 203
+                        });
+                    }
+                    for (let i = 0; i < queryPrices.length; i++) {
+                        const parsedArr = queryPrices[i];
+                        const priceArr = [];
+                        if (!Array.isArray(parsedArr)) {
+                            return err({
+                                feature: FEATURES.Product,
+                                code: 203
+                            });
+                        }
+                        for (let j = 0; j < parsedArr.length; j++) {
+                            const parsed = ProductModel.price.Parse(
+                                parsedArr[j], true
+                            );
+                            if (parsed === undefined) {
+                                return err({
+                                    feature: FEATURES.Product,
+                                    code: 203
+                                });
+                            }
+                            priceArr.push(parsed);
+                        }
+                        prices.push(priceArr);
+                    }
+                }
+
+                const actionResult = await get(
+                    client,
+                    options,
+                    {
+                        ids,
+                        titles,
+                        descriptions,
+                        labIDs,
+                        prices
+                    }
+                )
+                if (!actionResult.ok){
+                    const [code, data] = actionResult.error
+                    return err({
+                        feature: FEATURES.Product,
+                        code,
+                        data
+                    })
+                }
+
+                return ok({
+                    feature: FEATURES.Product,
+                    code: 100,
+                    data: {
+                        result: actionResult.value.result,
+                        length: actionResult.value.length
+                    }
+                })
             }
         )
     );
