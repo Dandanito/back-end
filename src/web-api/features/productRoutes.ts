@@ -7,6 +7,7 @@ import { FileModel } from '../../features/file/schema';
 import { ProductModel } from '../../features/product/schema';
 import client_verify_log_message from '../middlewares/client_verify_log_message';
 import edit from '../../features/product/actions/edit';
+import remove from '../../features/product/actions/remove';
 
 const ProductRoute = '/product';
 
@@ -134,6 +135,43 @@ const product = (app: Express) => {
                         ...parseProductResult.value,
                         fileUUIDs
                     }
+                );
+                if (!actionResult.ok) {
+                    const [code, data] = actionResult.error;
+                    return err({
+                        feature: FEATURES.Product,
+                        code,
+                        data
+                    });
+                }
+
+                return ok({
+                    feature: FEATURES.Product,
+                    code: 100,
+                    data: {
+                        id: actionResult.value.id
+                    }
+                });
+            }
+        )
+    );
+    app.delete(
+        ProductRoute,
+        client_verify_log_message(
+            ProductRoute + ':add',
+            [Role.Admin, Role.Laboratory],
+            async (req, _res, connection) => {
+                const id = ProductModel.id.Parse(req.body.id);
+                if (id === undefined) {
+                    return err({
+                        feature: FEATURES.Product,
+                        code: 212
+                    });
+                }
+
+                const actionResult = await remove(
+                    connection,
+                    id
                 );
                 if (!actionResult.ok) {
                     const [code, data] = actionResult.error;
