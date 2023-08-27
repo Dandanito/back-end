@@ -25,8 +25,8 @@ const token = (app: Express) => {
             try{
                 const response = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
                     params: {
-                        secret: '6LfnY9wnAAAAAA6ZUF02EnItL7vyw9zF9SD_S63U',
-                        response: req.body.captcha
+                        secret: process.env.DANDANITO_CAPTCHA_SECRET_KEY,
+                        response: req.headers.captcha
                     }
                 });
 

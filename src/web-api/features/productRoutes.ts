@@ -1,17 +1,17 @@
 import { Express } from 'express';
 import { err, ok } from 'never-catch';
+import { Parser } from '@mrnafisia/type-query';
 import { FEATURES } from '../../utils/features';
 import { Role } from '../../features/user/roles';
 import add from '../../features/product/actions/add';
+import get from '../../features/product/actions/get';
 import { FileModel } from '../../features/file/schema';
 import edit from '../../features/product/actions/edit';
-import remove from '../../features/product/actions/remove';
-import { Product, ProductModel } from '../../features/product/schema';
-import client_log_message from '../middlewares/client_log_message';
-import client_verify_log_message from '../middlewares/client_verify_log_message';
 import ParseGetOptions from '../utils/parseGetOptions';
-import { Parser } from '@mrnafisia/type-query';
-import get from '../../features/product/actions/get';
+import remove from '../../features/product/actions/remove';
+import client_log_message from '../middlewares/client_log_message';
+import { Product, ProductModel } from '../../features/product/schema';
+import client_verify_log_message from '../middlewares/client_verify_log_message';
 
 const ProductRoute = '/product';
 
@@ -20,7 +20,7 @@ const product = (app: Express) => {
         ProductRoute,
         client_verify_log_message(
             ProductRoute + ':add',
-            [Role.Admin, Role.Laboratory],
+            [Role.Admin, Role.Laboratory, Role.Store],
             async (req, _res, connection) => {
                 const parseProductResult = ProductModel.Parse(
                     req.body,
@@ -90,7 +90,7 @@ const product = (app: Express) => {
         ProductRoute,
         client_verify_log_message(
             ProductRoute + ':edit',
-            [Role.Admin, Role.Laboratory],
+            [Role.Admin, Role.Laboratory, Role.Store],
             async (req, _res, connection) => {
                 const parseProductResult = await ProductModel.Parse(
                     req.body,
@@ -112,6 +112,7 @@ const product = (app: Express) => {
                         }[parseProductResult.error])
                     });
                 }
+
                 let fileUUIDs: FileModel['uuid'][] | undefined;
                 if (req.body.fileUUIDs !== undefined) {
                     fileUUIDs = [];
@@ -163,7 +164,7 @@ const product = (app: Express) => {
         ProductRoute,
         client_verify_log_message(
             ProductRoute + ':add',
-            [Role.Admin, Role.Laboratory],
+            [Role.Admin, Role.Laboratory, Role.Store],
             async (req, _res, connection) => {
                 const id = ProductModel.id.Parse(req.body.id, true);
                 if (id === undefined) {
