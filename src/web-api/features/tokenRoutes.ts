@@ -9,6 +9,7 @@ import whoAmI from '../../features/token/actions/whoAmI';
 import { TokenModel } from '../../features/token/schema';
 import verify from '../../features/token/actions/verify';
 import client_log_message from '../middlewares/client_log_message';
+import axios from 'axios/index';
 
 const LoginRoute = '/login';
 const LogoutRoute = '/logout';
@@ -20,6 +21,23 @@ const token = (app: Express) => {
     app.post(
         LoginRoute,
         client_log_message(LoginRoute, async (req, _res, client) => {
+            // captcha
+            const response = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
+                params: {
+                    secret: '6LetWtsnAAAAAGGvbzrXe42yBvH0NKeVS3hWWnLr',
+                    response: req.body.captcha
+                }
+            });
+
+            const { success } = response.data;
+
+            if (!success) {
+                return err({
+                    feature: FEATURES.User,
+                    code: 402,
+                    data: 'CAPTCHA verification fail'
+                });
+            }
             // parse
             const parsedLoginInfoResult = UserModel.Parse(
                 {
