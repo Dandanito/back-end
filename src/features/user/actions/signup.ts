@@ -40,9 +40,9 @@ const signup = async (
         [
             {
                 role,
-                emailAddress,
+                emailAddress: emailAddress === undefined ? '' : emailAddress,
+                phoneNumber: phoneNumber === undefined ? '' : phoneNumber,
                 password: bcryptjs.hashSync(password, 8),
-                phoneNumber,
                 address,
                 firstName,
                 lastName,

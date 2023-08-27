@@ -19,7 +19,6 @@ const whoAmI = async (
         'serialConfirmation',
         'vote',
         'voteCount',
-        'password',
         'hasDelivery',
         'role']>;
     token: TokenModel<['id', 'userID', 'secret', 'createdAt', 'expireAt']>;
@@ -51,7 +50,6 @@ const whoAmI = async (
                 'u_serialConfirmation',
                 'u_vote',
                 'u_voteCount',
-                'u_password',
                 'u_hasDelivery',
                 'u_role',
                 't_id',
@@ -88,7 +86,6 @@ const whoAmI = async (
             serialConfirmation: infoResult.value.u_serialConfirmation,
             vote: infoResult.value.u_vote,
             voteCount: infoResult.value.u_voteCount,
-            password: infoResult.value.u_password,
             hasDelivery: infoResult.value.u_hasDelivery,
             role: infoResult.value.u_role
         },

@@ -9,7 +9,7 @@ import whoAmI from '../../features/token/actions/whoAmI';
 import { TokenModel } from '../../features/token/schema';
 import verify from '../../features/token/actions/verify';
 import client_log_message from '../middlewares/client_log_message';
-import axios from 'axios/index';
+const axios = require('axios');
 
 const LoginRoute = '/login';
 const LogoutRoute = '/logout';
@@ -22,30 +22,38 @@ const token = (app: Express) => {
         LoginRoute,
         client_log_message(LoginRoute, async (req, _res, client) => {
             // captcha
-            const response = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
-                params: {
-                    secret: '6LetWtsnAAAAAGGvbzrXe42yBvH0NKeVS3hWWnLr',
-                    response: req.body.captcha
+            try{
+                const response = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
+                    params: {
+                        secret: '6LfnY9wnAAAAAA6ZUF02EnItL7vyw9zF9SD_S63U',
+                        response: req.body.captcha
+                    }
+                });
+
+                if (response.data.score <= 0.5) {
+                    return err({
+                        feature: FEATURES.User,
+                        code: 402,
+                        data: JSON.stringify(response)
+                    });
                 }
-            });
-
-            const { success } = response.data;
-
-            if (!success) {
+            }catch (e){
                 return err({
                     feature: FEATURES.User,
                     code: 402,
-                    data: 'CAPTCHA verification fail'
-                });
+                    data: JSON.stringify(e)
+                })
             }
+
             // parse
             const parsedLoginInfoResult = UserModel.Parse(
                 {
-                    username: req.body.username,
-                    password: req.body.password
+                    emailAddress: req.body.emailAddress,
+                    phoneNumber: req.body.phoneNumber,
+                    password: req.body.password,
                 },
-                ['password'],
-                ['emailAddress', 'phoneNumber']
+                ['password'] as const,
+                ['emailAddress', 'phoneNumber'] as const
             );
             if (!parsedLoginInfoResult.ok) {
                 let code;

@@ -1,35 +1,41 @@
 import { Express } from 'express';
 import client_log_message from '../middlewares/client_log_message';
-import axios from 'axios';
+const axios = require('axios');
 import { err, ok } from 'never-catch';
 import { FEATURES } from '../../utils/features';
 import { UserModel } from '../../features/user/schema';
 import signup from '../../features/user/actions/signup';
 
-const UserRoute = 'user';
+const UserRoute = '/signup';
 
 const user = (app: Express) => {
     app.post(
         UserRoute,
         client_log_message(
-            UserRoute,
+            UserRoute + ':signup',
             async (req, _res, client) => {
                 // captcha
-                const response = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
-                    params: {
-                        secret: '6LetWtsnAAAAAGGvbzrXe42yBvH0NKeVS3hWWnLr',
-                        response: req.body.captcha
+                try{
+                    const response = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
+                        params: {
+                            secret: '6LfnY9wnAAAAAA6ZUF02EnItL7vyw9zF9SD_S63U',
+                            response: req.body.captcha
+                        }
+                    });
+
+                    if (response.data.score <= 0.5) {
+                        return err({
+                            feature: FEATURES.User,
+                            code: 402,
+                            data: JSON.stringify(response)
+                        });
                     }
-                });
-
-                const { success } = response.data;
-
-                if (!success) {
+                }catch (e){
                     return err({
                         feature: FEATURES.User,
                         code: 402,
-                        data: 'CAPTCHA verification fail'
-                    });
+                        data: JSON.stringify(e)
+                    })
                 }
 
                 const parsedUserResult = await UserModel.Parse(

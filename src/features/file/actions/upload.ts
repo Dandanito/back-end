@@ -2,9 +2,7 @@ import Error from '../error';
 import { v4 as uuid } from 'uuid';
 import path from 'path';
 import { Constants } from '../constant';
-import { isBinaryFile } from 'isbinaryfile';
 import { File, FileModel } from '../schema';
-import { fileTypeFromFile } from 'file-type';
 import { err, ok, Result } from 'never-catch';
 import { UploadedFile } from 'express-fileupload';
 import { Connection } from '../../../utils/connection';
@@ -51,7 +49,7 @@ const upload = async (
 
 const checkLimitsAndGetFileType = async (
     file: UploadedFile
-): Promise<Result<{ extension: string; mimeType: string }, Error>> => {
+): Promise<Result<{ extension: string; }, Error>> => {
     // size limit
     if (file.size > Constants.size) {
         return err([303]);
@@ -59,47 +57,12 @@ const checkLimitsAndGetFileType = async (
 
     // extension limit
     const extension = path.extname(file.name).slice(1);
-    const fileType = await fileTypeFromFile(file.tempFilePath);
-    const isBinary = await isBinaryFile(file.data, file.size);
-    if (Constants.allowedExtensions.length !== 0) {
-        if (fileType !== undefined) {
-            if (
-                !Constants.allowedExtensions.includes(fileType.ext) ||
-                !doesExtensionsMatch(extension, fileType.ext)
-            ) {
-                return err([304]);
-            }
-            return ok({ extension, mimeType: fileType.mime });
-        } else {
-            if (isBinary || !Constants.allowedExtensions.includes(extension)) {
-                return err([304]);
-            }
-            return ok({ extension, mimeType: 'text/plain' });
-        }
-    } else {
-        let mimeType = '';
-        if (fileType === undefined && !isBinary) {
-            mimeType = 'text/plain';
-        }
-        if (
-            fileType !== undefined &&
-            doesExtensionsMatch(extension, fileType.ext)
-        ) {
-            mimeType = fileType.mime;
-        }
-        return ok({
-            extension,
-            mimeType
-        });
-    }
-};
 
-const doesExtensionsMatch = (
-    nameExtension: string,
-    typeExtension: string
-): boolean =>
-    nameExtension === typeExtension ||
-    (nameExtension === 'jpeg' && typeExtension === 'jpg');
+    return ok({
+        extension
+    });
+
+};
 
 const addFile = async (
     { client }: Omit<Connection, 'user'>,
