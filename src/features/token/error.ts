@@ -1,9 +1,4 @@
 type Error =
-    | [101] /* can not parse secret */
-    | [102] /* can not parse username */
-    | [103] /* can not parse password */
-    | [104] /* can not parse id */
-    | [105] /* can not parse user id */
     | [201] /* invalid emailAddress */
     | [202] /* invalid password */
     | [203] /* invalid secret */
