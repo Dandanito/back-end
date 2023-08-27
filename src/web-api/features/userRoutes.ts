@@ -81,4 +81,4 @@ const user = (app: Express) => {
     );
 };
 
-export default user
+export default user;

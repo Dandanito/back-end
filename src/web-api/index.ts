@@ -1,6 +1,11 @@
 import cors from 'cors';
 import express from 'express';
 import fileUpload from 'express-fileupload';
+import file from './features/fileRoutes';
+import order from './features/orderRoutes';
+import product from './features/productRoutes';
+import token from './features/tokenRoutes';
+import user from './features/userRoutes';
 
 const port = Number(process.env.PORT);
 if (Number.isNaN(port)) {
@@ -19,5 +24,10 @@ app.use(fileUpload({
 app.use(express.static('/public'));
 
 // features
+file(app);
+order(app);
+product(app);
+token(app);
+user(app);
 
 app.listen(port, () => console.log(`dandanito listening on ${port}`));
