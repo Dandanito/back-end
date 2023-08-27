@@ -6,6 +6,7 @@ import order from './features/orderRoutes';
 import product from './features/productRoutes';
 import token from './features/tokenRoutes';
 import user from './features/userRoutes';
+import path from 'path';
 
 const port = Number(process.env.PORT);
 if (Number.isNaN(port)) {
@@ -19,7 +20,7 @@ app.use(fileUpload({
     limits: { fileSize: 50 * 1024 * 1024 }
 }));
 
-app.use(express.static('/public'));
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // features
 file(app);

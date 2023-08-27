@@ -4,6 +4,7 @@ import { Product, ProductModel } from '../schema';
 import { Context, U } from '@mrnafisia/type-query';
 import { Connection } from '../../../utils/connection';
 import { GetOptions } from '../../../utils/getOptions';
+import { DiscountType } from '../constant';
 
 const get = async (
     client: Connection['client'],
@@ -16,7 +17,19 @@ const get = async (
         sourceTypes?: ProductModel['sourceType'][]
         prices?: ProductModel['price'][][]
     }
-): Promise<Result<{ result: ProductModel<['id', 'title', 'description', 'vote', 'voteCount', 'sourceID', 'sourceType', 'price']>[]; length: number }, Error>> => {
+): Promise<Result<{
+    result: {
+        id: ProductModel['id'],
+        title: ProductModel['title'],
+        description: ProductModel['description'],
+        vote: ProductModel['vote'],
+        voteCount: ProductModel['voteCount'],
+        sourceID: ProductModel['sourceID'],
+        sourceType: ProductModel['sourceType'],
+        price: ProductModel['price'],
+        fileUUIDs: ProductModel['fileUUIDs'],
+        finalPrice: ProductModel['price']
+    }[]; length: number }, Error>> => {
     // get
     const where = (context: Context<typeof Product.table['columns']>) =>
         U.andAllOp([
@@ -40,7 +53,7 @@ const get = async (
         ]);
 
     const getProductsResult = await Product.select(
-        ['id', 'title', 'description', 'vote', 'voteCount', 'sourceID', 'sourceType', 'price'] as const,
+        ['id', 'title', 'description', 'vote', 'voteCount', 'sourceID', 'sourceType', 'price', 'fileUUIDs', 'discount', 'discountType'] as const,
         where,
         {
             ignoreInWhere: true,
@@ -73,7 +86,15 @@ const get = async (
     }
 
     return ok({
-        result: getProductsResult.value,
+        result: getProductsResult.value.map(e => ({
+            ...e,
+            fileUUIDs: (e.fileUUIDs as string[]).map(uuid => process.env.SERVER_IP + '/public/' + uuid),
+            finalPrice: e.discountType === DiscountType.None
+                ? e.price
+                : e.discountType === DiscountType.Amount
+                    ? e.price - e.discount
+                    : e.price - (e.price * e.discount / BigInt(100))
+        })),
         length: lengthResult.value.len
     });
 

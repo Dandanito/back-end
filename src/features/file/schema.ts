@@ -11,7 +11,7 @@ const FileTable = {
     title: 'file',
     columns: {
         uuid: {
-            type: 'uuid',
+            type: 'character varying',
             primary: true,
             nullable: false,
             default: false

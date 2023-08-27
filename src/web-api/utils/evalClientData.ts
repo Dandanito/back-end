@@ -16,7 +16,7 @@ const evalClientData: (
     code: number,
     data: unknown
 ) => unknown = (feature, code, data) => {
-    if (code === 7898) {
+    if (code === 100) {
         return data;
     }
     if (

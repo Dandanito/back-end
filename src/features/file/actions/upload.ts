@@ -34,8 +34,10 @@ const upload = async (
     } = addFileResult.value;
 
     // move
+    const uploadPath = path.join(__dirname, 'public', uuid);
+    console.log(uploadPath)
     const moveResult: Result<undefined, Error> = await file
-        .mv('/public')
+        .mv(uploadPath)
         .then(() => ok(undefined))
         .catch(error => err([402, JSON.stringify(error)]));
     if (!moveResult.ok) {
@@ -70,7 +72,7 @@ const addFile = async (
 ): Promise<Result<{ file: FileModel<['uuid']>; }, Error>> => {
     const addingFile = {
         ...file,
-        uuid: uuid() + file.extension
+        uuid: uuid() + '.' + file.extension
     };
     const result = await File.insert([addingFile], [
         'uuid'

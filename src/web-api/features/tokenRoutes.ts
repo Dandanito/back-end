@@ -89,7 +89,7 @@ const token = (app: Express) => {
 
             return ok({
                 feature: FEATURES.Token,
-                code: 7898,
+                code: 100,
                 data: {
                     token: actionResult.value
                 },
@@ -123,7 +123,7 @@ const token = (app: Express) => {
 
             return ok({
                 feature: FEATURES.Token,
-                code: 7898,
+                code: 100,
                 data: {
                     id: actionResult.value.id
                 },
@@ -157,7 +157,7 @@ const token = (app: Express) => {
 
             return ok({
                 feature: FEATURES.Token,
-                code: 7898,
+                code: 100,
                 data: {
                     token: actionResult.value
                 },
@@ -190,7 +190,7 @@ const token = (app: Express) => {
 
             return ok({
                 feature: FEATURES.Token,
-                code: 7898,
+                code: 100,
                 histories: [],
                 data: actionResult.value,
                 userID: actionResult.value.user.id
@@ -222,7 +222,7 @@ const token = (app: Express) => {
 
             return ok({
                 feature: FEATURES.Token,
-                code: 7898,
+                code: 100,
                 histories: [],
                 userID: actionResult.value.userID
             });
