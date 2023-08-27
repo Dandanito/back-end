@@ -107,9 +107,7 @@ const addFile = async (
 ): Promise<Result<{ file: FileModel<['uuid']>; }, Error>> => {
     const addingFile = {
         ...file,
-        uuid: uuid(),
-        isTemp: true,
-        createdAt: new Date()
+        uuid: uuid() + file.extension
     };
     const result = await File.insert([addingFile], [
         'uuid'

@@ -3,6 +3,7 @@ type Error =
     | [201] /* invalid uuid */
     | [202] /* invalid feature */
     | [203] /* invalid file */
+    | [204] /* no files to update */
     | [301] /* file not found */
     | [302] /* upload is not enabled for this feature */
     | [303] /* size limit */
