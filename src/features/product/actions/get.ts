@@ -12,15 +12,17 @@ const get = async (
         ids?: ProductModel['id'][],
         titles?: ProductModel['title'][]
         descriptions?: ProductModel['description'][]
-        labIDs?: ProductModel['labID'][]
+        sourceIDs?: ProductModel['sourceID'][]
+        sourceTypes?: ProductModel['sourceType'][]
         prices?: ProductModel['price'][][]
     }
-): Promise<Result<{ result: ProductModel<['id', 'title', 'description', 'vote', 'voteCount', 'labID', 'price']>[]; length: number }, Error>> => {
+): Promise<Result<{ result: ProductModel<['id', 'title', 'description', 'vote', 'voteCount', 'sourceID', 'sourceType', 'price']>[]; length: number }, Error>> => {
     // get
     const where = (context: Context<typeof Product.table['columns']>) =>
         U.andAllOp([
             context.colList('id', 'in', filters.ids),
-            context.colList('labID', 'in', filters.labIDs),
+            context.colList('sourceID', 'in', filters.sourceIDs),
+            context.colList('sourceType', 'in', filters.sourceTypes),
             context.colLike('title', 'like all', filters.titles?.map(v => `%${v}%`)),
             context.colLike('description', 'like all', filters.descriptions?.map(v => `%${v}%`)),
             U.orAllOp([
@@ -38,7 +40,7 @@ const get = async (
         ]);
 
     const getProductsResult = await Product.select(
-        ['id', 'title', 'description', 'vote', 'voteCount', 'labID', 'price'] as const,
+        ['id', 'title', 'description', 'vote', 'voteCount', 'sourceID', 'sourceType', 'price'] as const,
         where,
         {
             ignoreInWhere: true,

@@ -22,7 +22,7 @@ const add = async (
     }
 
     // permission
-    if (connection.user.role !== Role.Laboratory) {
+    if (![Role.Laboratory, Role.Store].includes(connection.user.role)) {
         return err([301]);
     }
 
@@ -36,7 +36,8 @@ const add = async (
                 productGroup,
                 vote: 0,
                 voteCount: 0,
-                labID: connection.user.id,
+                sourceID: connection.user.id,
+                sourceType: connection.user.role,
                 fileUUIDs,
                 discount: discount !== undefined ? discount : BigInt(0),
                 discountType: discountType !== undefined ? discountType : DiscountType.None

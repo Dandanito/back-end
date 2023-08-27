@@ -29,8 +29,13 @@ const ProductTable = {
             default: false,
             max: 6
         },
-        labID: {
+        sourceID: {
             type: 'integer',
+            nullable: false,
+            default: false
+        },
+        sourceType: {
+            type: 'smallint',
             nullable: false,
             default: false
         },
@@ -76,7 +81,8 @@ type ProductModel<R extends readonly (keyof (typeof ProductTable)['columns'])[] 
     'title',
     'description',
     'productGroup',
-    'labID',
+    'sourceID',
+    'sourceType',
     'vote',
     'voteCount',
     'price',

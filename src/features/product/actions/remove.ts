@@ -23,7 +23,7 @@ const remove = async (
     }
 
     // permission
-    if (getProductResult.value.labID !== connection.user.id) {
+    if (getProductResult.value.sourceID !== connection.user.id) {
         return err([301]);
     }
 
