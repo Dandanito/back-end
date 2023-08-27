@@ -22,7 +22,7 @@ const product = (app: Express) => {
             ProductRoute + ':add',
             [Role.Admin, Role.Laboratory],
             async (req, _res, connection) => {
-                const parseProductResult = await ProductModel.Parse(
+                const parseProductResult = ProductModel.Parse(
                     req.body,
                     ['title', 'description', 'price', 'productGroup'] as const,
                     ['discount', 'discountType'] as const,
@@ -304,9 +304,9 @@ const product = (app: Express) => {
                     }
                 }
 
-                if (req.query.price !== undefined) {
+                if (req.query.prices !== undefined) {
                     const queryPrices = Parser.json(
-                        req.query.price
+                        req.query.prices
                     );
                     prices = [];
                     if (!Array.isArray(queryPrices)) {
