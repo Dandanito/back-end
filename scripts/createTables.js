@@ -10,7 +10,8 @@ import { Token } from '../src/features/token/schema';
 
 import { User } from '../src/features/user/schema';
 
-const connectionUrl = 'postgres://postgres:password@localhost:5432/dandanito';
+const connectionUrl = 'postgres://postgres:12345678@localhost:5432/dandanito';
+
 const pool = createPool(connectionUrl);
 
 (async () => {
