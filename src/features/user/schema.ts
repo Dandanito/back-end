@@ -60,12 +60,12 @@ const UserTable = {
         vote: {
             type: 'double precision',
             default: false,
-            nullable: true
+            nullable: false
         },
         voteCount: {
             type: 'smallint',
             default: false,
-            nullable: true
+            nullable: false
         },
         password: {
             type: 'character varying',
