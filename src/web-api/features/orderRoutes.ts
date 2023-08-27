@@ -32,14 +32,6 @@ const order = (app: Express) => {
                     });
                 }
 
-                const parsedLabID = OrderModel.labID.Parse(req.body.labID);
-                if (parsedLabID === undefined) {
-                    return err({
-                        feature: FEATURES.Order,
-                        code: 201
-                    });
-                }
-
                 const parsedOrderRows: OrderRowModel<['productID', 'count']>[] = [];
                 const orderRows = Parser.json(req.body.orderRows);
                 if (!Array.isArray(orderRows)) {
@@ -80,7 +72,6 @@ const order = (app: Express) => {
                 const actionResult = await add(
                     connection,
                     parsedDescription,
-                    parsedLabID,
                     parsedOrderRows
                 );
                 if (!actionResult.ok) {
@@ -303,7 +294,6 @@ const order = (app: Express) => {
                 let ids: OrderModel['id'][] | undefined;
                 let descriptions: OrderModel['description'][] | undefined;
                 let customerIDs: OrderModel['customerID'][] | undefined;
-                let labIDs: OrderModel['labID'][] | undefined;
                 let statuses: OrderModel['status'][] | undefined;
                 let prices: OrderModel['price'][][] | undefined;
                 let dates: OrderModel['date'][][] | undefined;
@@ -384,27 +374,6 @@ const order = (app: Express) => {
                     }
                 }
 
-                if (req.query.labIDs !== undefined) {
-                    const queryLabIDs = Parser.json(req.query.labIDs);
-                    labIDs = [];
-                    if (!Array.isArray(queryLabIDs)) {
-                        return err({
-                            feature: FEATURES.Order,
-                            code: 201
-                        });
-                    }
-                    for (let i = 0; i < queryLabIDs.length; i++) {
-                        const parsed = OrderModel.labID.Parse(queryLabIDs[i], true);
-                        if (parsed === undefined) {
-                            return err({
-                                feature: FEATURES.Order,
-                                code: 201
-                            });
-                        }
-                        labIDs.push(parsed);
-                    }
-                }
-
                 if (req.query.statuses !== undefined) {
                     const queryStatuses = Parser.json(req.query.statuses);
                     statuses = [];
@@ -415,7 +384,7 @@ const order = (app: Express) => {
                         });
                     }
                     for (let i = 0; i < queryStatuses.length; i++) {
-                        const parsed = OrderModel.labID.Parse(queryStatuses[i], true);
+                        const parsed = OrderModel.status.Parse(queryStatuses[i], true);
                         if (parsed === undefined) {
                             return err({
                                 feature: FEATURES.Order,
@@ -508,8 +477,7 @@ const order = (app: Express) => {
                         statuses,
                         customerIDs,
                         dates,
-                        descriptions,
-                        labIDs
+                        descriptions
                     }
                 );
                 if (!actionResult.ok) {
