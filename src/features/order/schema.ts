@@ -21,11 +21,6 @@ const OrderTable = {
             default: false,
             nullable: false
         },
-        labID: {
-            type: 'integer',
-            default: false,
-            nullable: false
-        },
         price: {
             type: 'bigint',
             default: false,
@@ -50,7 +45,6 @@ type OrderModel<R extends readonly (keyof (typeof OrderTable)['columns'])[] = [
     'id',
     'description',
     'customerID',
-    'labID',
     'price',
     'date',
     'status'

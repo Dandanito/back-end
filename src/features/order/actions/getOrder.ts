@@ -13,19 +13,17 @@ const getOrder = async (
         ids?: OrderModel['id'][],
         descriptions?: OrderModel['description'][]
         customerIDs?: OrderModel['customerID'][]
-        labIDs?: OrderModel['labID'][]
         statuses?: OrderModel['status'][]
         prices?: OrderModel['price'][][]
         dates?: OrderModel['date'][][]
     }
-): Promise<Result<{ result: OrderModel<['id', 'customerID', 'status', 'labID', 'description', 'price', 'date']>[]; length: number }, Error>> => {
+): Promise<Result<{ result: OrderModel<['id', 'customerID', 'status', 'description', 'price', 'date']>[]; length: number }, Error>> => {
     // get
     const where = (context: Context<typeof Order.table['columns']>) =>
         U.andAllOp([
             context.colList('id', 'in', filters.ids),
             context.colList('customerID', 'in', filters.customerIDs),
             context.colList('status', 'in', filters.statuses),
-            context.colList('labID', 'in', filters.labIDs),
             context.colLike('description', 'like all', filters.descriptions?.map(v => `%${v}%`)),
             U.orAllOp([
                 context.colList(
@@ -54,7 +52,7 @@ const getOrder = async (
         ]);
 
     const getOrdersResult = await Order.select(
-        ['id', 'customerID', 'status', 'labID', 'description', 'price', 'date'] as const,
+        ['id', 'customerID', 'status', 'description', 'price', 'date'] as const,
         where,
         {
             ignoreInWhere: true,

@@ -3,10 +3,10 @@ import { Status } from '../constant';
 import { err, ok, Result } from 'never-catch';
 import { ProductModel } from '../../product/schema';
 import { Expression, U } from '@mrnafisia/type-query';
+import { DiscountType } from '../../product/constant';
 import { Connection } from '../../../utils/connection';
 import { Order, OrderModel, OrderRow, OrderRowModel } from '../schema';
 import { addOrderRow, checkOrderExistence, checkProductExistence } from '../util';
-import { DiscountType } from '../../product/constant';
 
 const edit = async (
     connection: Connection,
@@ -32,7 +32,7 @@ const edit = async (
         return checkOrderExistenceResult;
     }
     let totalPrice = checkOrderExistenceResult.value.price;
-    const { customerID, status, labID } = checkOrderExistenceResult.value;
+    const { customerID, status } = checkOrderExistenceResult.value;
 
     // permission
     if (customerID === connection.user.id) {
@@ -48,7 +48,6 @@ const edit = async (
     if (addOrderRows !== undefined) {
         const checkProductExistenceResult = await checkProductExistence(
             connection,
-            labID,
             addOrderRows.map(e => e.productID)
         );
         if (!checkProductExistenceResult.ok) {

@@ -3,14 +3,12 @@ import { Status } from '../constant';
 import { err, ok, Result } from 'never-catch';
 import { Order, OrderModel, OrderRowModel } from '../schema';
 import { addOrderRow, checkProductExistence } from '../util';
-import { User, UserModel } from '../../user/schema';
 import { DiscountType } from '../../product/constant';
 import { Connection } from '../../../utils/connection';
 
 const add = async (
     connection: Connection,
     description: OrderModel['description'],
-    labID: UserModel['id'],
     products: OrderRowModel<['productID', 'count']>[]
 ): Promise<Result<{ id: OrderModel['id'] }, Error>> => {
 
@@ -31,21 +29,9 @@ const add = async (
         });
     }
 
-    // check lab existence
-    const checkLabExistenceResult = await User.select(
-        ['id'] as const,
-        context => context.colCmp('id', '=', labID)
-    ).exec(connection.client, ['get', 'one']);
-    if (!checkLabExistenceResult.ok) {
-        return err(
-            checkLabExistenceResult.error === false ? [302] : [401, checkLabExistenceResult.error]
-        );
-    }
-
     // check product existence
     const checkProductExistenceResult = await checkProductExistence(
         connection,
-        labID,
         products.map(e => e.productID)
     );
     if (!checkProductExistenceResult.ok) {
@@ -73,7 +59,6 @@ const add = async (
     const addOrderResult = await Order.insert(
         [
             {
-                labID,
                 status: Status.Draft,
                 customerID: connection.user.id,
                 description,

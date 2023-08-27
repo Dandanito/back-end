@@ -3,16 +3,16 @@ import { err, ok, Result } from 'never-catch';
 import { Connection } from '../../utils/connection';
 import { Product, ProductModel } from '../product/schema';
 import { Order, OrderModel, OrderRow, OrderRowModel } from './schema';
+import { Role } from '../user/roles';
 
 const checkProductExistence = async (
     { client }: Omit<Connection, 'user'>,
-    labID: ProductModel['labID'],
     productIDs: ProductModel['id'][]
-): Promise<Result<ProductModel<['id', 'price', 'discount', 'discountType']>[], Error>> => {
+): Promise<Result<ProductModel<['id', 'price', 'discount', 'discountType', 'sourceID']>[], Error>> => {
     const checkProductExistenceResult = await Product.select(
-        ['id', 'price', 'discount', 'discountType'] as const,
+        ['id', 'price', 'discount', 'discountType', 'sourceID'] as const,
         context => context.colsAnd({
-            labID: ['=', labID],
+            sourceType: ['=', Role.Store],
             id: ['in', productIDs]
         })
     ).exec(client, ['get', productIDs.length]);
@@ -43,9 +43,9 @@ const addOrderRow = async (
 const checkOrderExistence = async (
     { client }: Omit<Connection, 'user'>,
     id: OrderModel['id']
-): Promise<Result<OrderModel<['status', 'price', 'customerID', 'labID']>, Error>> => {
+): Promise<Result<OrderModel<['status', 'price', 'customerID']>, Error>> => {
     const checkOrderExistenceResult = await Order.select(
-        ['status', 'price', 'customerID', 'labID'] as const,
+        ['status', 'price', 'customerID'] as const,
         context => context.colCmp('id', '=', id)
     ).exec(client, ['get', 'one']);
     if (!checkOrderExistenceResult.ok) {
