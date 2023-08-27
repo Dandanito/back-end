@@ -1,10 +1,9 @@
 import Error from '../error';
 import { Status } from '../constant';
-import { Order, OrderModel } from '../schema';
 import { err, ok, Result } from 'never-catch';
-import { checkProductExistence } from '../util';
+import { Order, OrderModel, OrderRowModel } from '../schema';
+import { addOrderRow, checkProductExistence } from '../util';
 import { User, UserModel } from '../../user/schema';
-import { ProductModel } from '../../product/schema';
 import { DiscountType } from '../../product/constant';
 import { Connection } from '../../../utils/connection';
 
@@ -12,20 +11,8 @@ const add = async (
     connection: Connection,
     description: OrderModel['description'],
     labID: UserModel['id'],
-    productIDs: ProductModel['id'][]
+    products: OrderRowModel<['productID', 'count']>[]
 ): Promise<Result<{ id: OrderModel['id'] }, Error>> => {
-    // validate
-    if (!OrderModel.description.Validate(description)) {
-        return err([203]);
-    }
-    for (const productID of productIDs) {
-        if (!ProductModel.id.Validate(productID)) {
-            return err([202]);
-        }
-    }
-    if (!OrderModel.labID.Validate(labID)) {
-        return err([201]);
-    }
 
     // check order existence (there should be 1 ongoing order at the time)
     const checkOrderExistenceResult = await Order.select(
@@ -59,21 +46,26 @@ const add = async (
     const checkProductExistenceResult = await checkProductExistence(
         connection,
         labID,
-        productIDs
+        products.map(e => e.productID)
     );
     if (!checkProductExistenceResult.ok) {
         return checkProductExistenceResult;
     }
-    let totalPrice = BigInt(0);
-    const data = [];
-    for (const product of checkProductExistenceResult.value) {
-        totalPrice += product.discountType === DiscountType.Amount ?
-            product.price - product.discount :
-            product.price * product.discount / BigInt(100);
-        data.push({
-            price: product.price,
-            discountType: product.discountType,
-            discount: product.discount
+    let totalPrice: bigint = BigInt(0);
+    const orderRows: OrderRowModel<['productID', 'price', 'discount', 'discountType', 'count']>[] = [];
+    for (const { productID, count } of products) {
+        const correspondingRow = checkProductExistenceResult.value.find(e => e.id === productID);
+        if (correspondingRow === undefined) {
+            return err([401, 'corresponding row not found']);
+        }
+        const price = BigInt(count) * (correspondingRow.discountType === DiscountType.Amount ? correspondingRow.price - correspondingRow.discount :
+            correspondingRow.price - (correspondingRow.price * correspondingRow.discount / BigInt(100)));
+        totalPrice += price;
+        orderRows.push({
+            ...correspondingRow,
+            price,
+            productID,
+            count
         });
     }
 
@@ -95,7 +87,16 @@ const add = async (
         return err([401, addOrderResult.error]);
     }
 
-    // TODO Order rows
+    const addOrderRowResult = await addOrderRow(
+        connection,
+        orderRows.map(e => ({
+            ...e,
+            orderID: addOrderResult.value.id
+        }))
+    );
+    if (!addOrderRowResult.ok) {
+        return addOrderRowResult;
+    }
 
     return ok({
         id: addOrderResult.value.id

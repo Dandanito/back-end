@@ -12,12 +12,12 @@ const edit = async (
     connection: Connection,
     id: OrderModel['id'],
     description?: OrderModel['description'],
-    addProductIDs?: OrderRowModel<['productID', 'count']>[],
+    addOrderRows?: OrderRowModel<['productID', 'count']>[],
     editOrderRows?: OrderRowModel<['productID', 'count']>[],
     removeProductIDs?: ProductModel['id'][]
 ): Promise<Result<OrderModel['id'], Error>> => {
     if (description !== undefined &&
-        addProductIDs !== undefined &&
+        addOrderRows !== undefined &&
         editOrderRows !== undefined &&
         removeProductIDs !== undefined) {
         return err([204]);
@@ -45,23 +45,23 @@ const edit = async (
     }
 
     // check order existence
-    if (addProductIDs !== undefined) {
+    if (addOrderRows !== undefined) {
         const checkProductExistenceResult = await checkProductExistence(
             connection,
             labID,
-            addProductIDs.map(e => e.productID)
+            addOrderRows.map(e => e.productID)
         );
         if (!checkProductExistenceResult.ok) {
             return checkProductExistenceResult;
         }
         const orderRows: OrderRowModel<['productID', 'orderID', 'price', 'discount', 'discountType', 'count']>[] = [];
-        for (const { productID, count } of addProductIDs) {
+        for (const { productID, count } of addOrderRows) {
             const correspondingRow = checkProductExistenceResult.value.find(e => e.id === productID);
             if (correspondingRow === undefined) {
                 return err([401, 'corresponding row not found']);
             }
-            const price = correspondingRow.discountType === DiscountType.Amount ? correspondingRow.price - correspondingRow.discount :
-                correspondingRow.price - (correspondingRow.price * correspondingRow.discount / BigInt(100));
+            const price = BigInt(count) * (correspondingRow.discountType === DiscountType.Amount ? correspondingRow.price - correspondingRow.discount :
+                correspondingRow.price - (correspondingRow.price * correspondingRow.discount / BigInt(100)));
             totalPrice += price;
             orderRows.push({
                 ...correspondingRow,
