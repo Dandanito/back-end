@@ -204,7 +204,8 @@ const product = (app: Express) => {
                 let ids: ProductModel['id'][] | undefined;
                 let titles: ProductModel['title'][] | undefined;
                 let descriptions: ProductModel['description'][] | undefined;
-                let labIDs: ProductModel['labID'][] | undefined;
+                let sourceIDs: ProductModel['sourceID'][] | undefined;
+                let sourceTypes: ProductModel['sourceType'][] | undefined;
                 let prices: ProductModel['price'][][] | undefined;
 
                 const options = ParseGetOptions(
@@ -283,24 +284,45 @@ const product = (app: Express) => {
                     }
                 }
 
-                if (req.query.labIDs !== undefined) {
-                    const queryLabIDs = Parser.json(req.query.labIDs);
-                    labIDs = [];
-                    if (!Array.isArray(queryLabIDs)) {
+                if (req.query.sourceIDs !== undefined) {
+                    const querySourceIDs = Parser.json(req.query.sourceIDs);
+                    sourceIDs = [];
+                    if (!Array.isArray(querySourceIDs)) {
                         return err({
                             feature: FEATURES.Product,
                             code: 206
                         });
                     }
-                    for (let i = 0; i < queryLabIDs.length; i++) {
-                        const parsed = ProductModel.labID.Parse(queryLabIDs[i], true);
+                    for (let i = 0; i < querySourceIDs.length; i++) {
+                        const parsed = ProductModel.sourceID.Parse(querySourceIDs[i], true);
                         if (parsed === undefined) {
                             return err({
                                 feature: FEATURES.Product,
                                 code: 206
                             });
                         }
-                        labIDs.push(parsed);
+                        sourceIDs.push(parsed);
+                    }
+                }
+
+                if (req.query.sourceTypes !== undefined) {
+                    const querySourceTypes = Parser.json(req.query.sourceTypes);
+                    sourceTypes = [];
+                    if (!Array.isArray(querySourceTypes)) {
+                        return err({
+                            feature: FEATURES.Product,
+                            code: 206
+                        });
+                    }
+                    for (let i = 0; i < querySourceTypes.length; i++) {
+                        const parsed = ProductModel.sourceType.Parse(querySourceTypes[i], true);
+                        if (parsed === undefined) {
+                            return err({
+                                feature: FEATURES.Product,
+                                code: 206
+                            });
+                        }
+                        sourceTypes.push(parsed);
                     }
                 }
 
@@ -347,7 +369,8 @@ const product = (app: Express) => {
                         ids,
                         titles,
                         descriptions,
-                        labIDs,
+                        sourceIDs,
+                        sourceTypes,
                         prices
                     }
                 )
