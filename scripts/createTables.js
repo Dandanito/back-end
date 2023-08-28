@@ -10,6 +10,8 @@ import { Token } from '../src/features/token/schema';
 
 import { User } from '../src/features/user/schema';
 
+import { File } from '../src/features/file/schema';
+
 const connectionUrl = 'postgres://postgres:12345678@localhost:5432/dandanito';
 
 const pool = createPool(connectionUrl);
@@ -21,7 +23,8 @@ const pool = createPool(connectionUrl);
         Order.table,
         Product.table,
         Token.table,
-        User.table
+        User.table,
+        File.table,
     ]);
     console.log(result);
     client.release();
