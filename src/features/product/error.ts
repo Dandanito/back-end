@@ -15,6 +15,7 @@ type Error =
     | [302] /* product does not exist */
     | [303] /* edit order row does not exist */
     | [304] /* edit order row does not exist */
+    | [305] /* you are not allowed to vote for this product */
     | [401, unknown]
 
 export default Error;
