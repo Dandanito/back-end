@@ -12,6 +12,7 @@ const edit = async (
     connection: Connection,
     id: OrderModel['id'],
     description?: OrderModel['description'],
+    status?: OrderModel['status'],
     addOrderRows?: OrderRowModel<['productID', 'count']>[],
     editOrderRows?: OrderRowModel<['productID', 'count']>[],
     removeProductIDs?: ProductModel['id'][]
@@ -32,7 +33,7 @@ const edit = async (
         return checkOrderExistenceResult;
     }
     let totalPrice = checkOrderExistenceResult.value.price;
-    const { customerID, status } = checkOrderExistenceResult.value;
+    const { customerID, status: currStatus } = checkOrderExistenceResult.value;
 
     // permission
     if (customerID === connection.user.id) {
@@ -40,11 +41,11 @@ const edit = async (
     }
 
     // is order editable
-    if (status === Status.Done) {
+    if (currStatus === Status.Done) {
         return err([305]);
     }
 
-    // check order existence
+    // add order rows
     if (addOrderRows !== undefined) {
         const checkProductExistenceResult = await checkProductExistence(
             connection,
@@ -80,6 +81,7 @@ const edit = async (
         }
     }
 
+    // edit and remove order rows
     if (editOrderRows !== undefined || removeProductIDs !== undefined) {
         const getOrderRowsResult = await getOrderRows(
             connection,
@@ -135,11 +137,12 @@ const edit = async (
         }
     }
 
-    return  await editOrder(
+    return await editOrder(
         connection,
         {
             id,
             description,
+            status,
             price: totalPrice
         }
     );
@@ -198,10 +201,11 @@ const removeOrderRow = async (
 
 const editOrder = async (
     { client }: Omit<Connection, 'user'>,
-    { id, description, price }: OrderModel<['id'], ['description', 'price']>
+    { id, description, status, price }: OrderModel<['id'], ['description', 'status', 'price']>
 ): Promise<Result<OrderModel['id'], Error>> => {
     const editOrderResult = await Order.update({
             description,
+            status,
             price
         },
         context => context.colCmp('id', '=', id),
