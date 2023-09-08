@@ -416,17 +416,16 @@ const order = (app: Express) => {
      * /order:
      *   get:
      *     summary: Get Orders.
-     *     parameters:
-     *         - in: header
-     *           name: secret
-     *           required: true
-     *           schema:
-     *             type: string
-     *           description: API key or token for authentication
      *     description: Get orders with provided data.
      *     tags:
      *      - Order
      *     parameters:
+     *       - in: header
+     *         name: secret
+     *         required: true
+     *         schema:
+     *           type: string
+     *         description: API key or token for authentication
      *       - in: query
      *         name: start
      *         required: false
@@ -680,17 +679,16 @@ const order = (app: Express) => {
      * /order-row:
      *   get:
      *     summary: Get Order Rows.
-     *     parameters:
-     *         - in: header
-     *           name: secret
-     *           required: true
-     *           schema:
-     *             type: string
-     *           description: API key or token for authentication
      *     description: Get order rows with provided data.
      *     tags:
      *      - Order
      *     parameters:
+     *       - in: header
+     *         name: secret
+     *         required: true
+     *         schema:
+     *           type: string
+     *         description: API key or token for authentication
      *       - in: query
      *         name: start
      *         required: false

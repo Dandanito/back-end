@@ -322,18 +322,17 @@ const product = (app: Express) => {
      * @swagger
      * /order:
      *   get:
-     *     summary: Get Orders.
-     *     parameters:
-     *         - in: header
-     *           name: secret
-     *           required: true
-     *           schema:
-     *             type: string
-     *           description: API key or token for authentication
+     *     summary: "Get Products"
      *     description: Get orders with provided data.
      *     tags:
      *      - Product
      *     parameters:
+     *       - in: header
+     *         name: secret
+     *         required: true
+     *         schema:
+     *           type: string
+     *         description: API key or token for authentication
      *       - in: query
      *         name: start
      *         required: false

@@ -15,13 +15,6 @@ const file = (app: Express) => {
      * /file:
      *   post:
      *     summary: Upload a file.
-     *     parameters:
-     *         - in: header
-     *           name: secret
-     *           required: true
-     *           schema:
-     *             type: string
-     *           description: API key or token for authentication
      *     description: Upload a file.
      *     tags:
      *      - File
@@ -32,6 +25,12 @@ const file = (app: Express) => {
      *         name: uploadedFile
      *         type: file
      *         description: The image file to upload.
+     *       - in: header
+     *         name: secret
+     *         required: true
+     *         schema:
+     *           type: string
+     *         description: API key or token for authentication
      *     responses:
      *       '100':
      *         fileUUID: a string ending with .extension .
