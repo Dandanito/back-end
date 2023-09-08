@@ -57,11 +57,11 @@ const token = (app: Express) => {
                 const response = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
                     params: {
                         secret: process.env.DANDANITO_CAPTCHA_SECRET_KEY,
-                        response: req.headers.captcha
+                        response: req.body.captcha
                     }
                 });
 
-                if (response.data.score <= 0.5) {
+                if (response.data.success === undefined || !response.data.success || response.data.score <= 0.5) {
                     return err({
                         feature: FEATURES.User,
                         code: 402,
