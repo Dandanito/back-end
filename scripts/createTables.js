@@ -12,7 +12,7 @@ import { User } from '../src/features/user/schema';
 
 import { File } from '../src/features/file/schema';
 
-const connectionString = 'postgres://postgres:12345678@65.21.60.11:5432/dandanito';
+const connectionString = 'postgres://postgres:12345678@localhost:5432/dandanito';
 
 const pool = createPool({ connectionString });
 
