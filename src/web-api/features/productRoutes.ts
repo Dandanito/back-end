@@ -16,6 +16,44 @@ import client_verify_log_message from '../middlewares/client_verify_log_message'
 const ProductRoute = '/product';
 
 const product = (app: Express) => {
+    /**
+     * @swagger
+     * /product:
+     *   post:
+     *     summary: Create a new product
+     *     description: Create a new product with the provided data.
+     *     tags:
+     *      - Product
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               title:
+     *                 type: string
+     *               description:
+     *                 type: string
+     *               price:
+     *                 type: string
+     *               productGroup:
+     *                 type: integer
+     *               discount:
+     *                 type: string
+     *               discountType:
+     *                 type: integer
+     *             example:
+     *               title: example title for a product
+     *               description: example description for a product
+     *               price: "10000000"
+     *               productGroup: 1
+     *               discount: "10000000"
+     *               discountType: 1
+     *     responses:
+     *       '100':
+     *         description: User created successfully.
+     */
     app.post(
         ProductRoute,
         client_verify_log_message(
@@ -86,6 +124,45 @@ const product = (app: Express) => {
             }
         )
     );
+    /**
+     * @swagger
+     * /product:
+     *   patch:
+     *     summary: Edit a product
+     *     description: Edit a product with the provided data.
+     *     tags:
+     *      - Product
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               id:
+     *                 type: integer
+     *               title:
+     *                 type: string
+     *               description:
+     *                 type: string
+     *               price:
+     *                 type: string
+     *               discount:
+     *                 type: string
+     *               discountType:
+     *                 type: integer
+     *             example:
+     *               id: 1
+     *               title: example title for a product
+     *               description: example description for a product
+     *               price: "10000000"
+     *               productGroup: 1
+     *               discount: "10000000"
+     *               discountType: 1
+     *     responses:
+     *       '100':
+     *         description: User created successfully.
+     */
     app.patch(
         ProductRoute,
         client_verify_log_message(
@@ -160,6 +237,29 @@ const product = (app: Express) => {
             }
         )
     );
+    /**
+     * @swagger
+     * /product:
+     *   delete:
+     *     summary: Delete a product
+     *     description: Delete a product with the provided data.
+     *     tags:
+     *      - Product
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               id:
+     *                 type: integer
+     *             example:
+     *               id: 1
+     *     responses:
+     *       '100':
+     *         description: User created successfully.
+     */
     app.delete(
         ProductRoute,
         client_verify_log_message(
@@ -197,6 +297,47 @@ const product = (app: Express) => {
             }
         )
     );
+    /**
+     * @swagger
+     * /order:
+     *   get:
+     *     summary: Get Orders
+     *     description: Get orders with provided data.
+     *     tags:
+     *      - Product
+     *     parameters:
+     *       - in: query
+     *         name: start
+     *         required: false
+     *         type: string
+     *         description: The start of result from executed query output.
+     *       - in: query
+     *         name: step
+     *         required: false
+     *         type: string
+     *         description: How many result should be returned from executing query.
+     *       - in: query
+     *         name: orders
+     *         required: false
+     *         type: json
+     *         description: An array containing json objects which has 2 keys including by and direction by represents database column and direction has 2 options of asc and desc meaning in which order database should sort the output.
+     *       - in: query
+     *         name: filters
+     *         required: false
+     *         type: json
+     *         description: A json object with specific keys and values which database query will be created according to it's values.
+     *         example: {
+     *             ids: ["1", "2"],
+     *             titles: ["example", "title"],
+     *             descriptions: ["example", "description"],
+     *             sourceIDs: ["3", "4"],
+     *             sourceTypes: ["1", "2"],
+     *             prices: [["1000000"], ["500000", "1500000"]]
+     *         }
+     *     responses:
+     *       '100':
+     *         description: Data fetched successfully
+     */
     app.get(
         ProductRoute,
         client_log_message(
