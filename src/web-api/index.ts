@@ -7,6 +7,8 @@ import product from './features/productRoutes';
 import token from './features/tokenRoutes';
 import user from './features/userRoutes';
 import path from 'path';
+import specs from '../../swagger';
+import swaggerUi from 'swagger-ui-express';
 
 const port = Number(process.env.PORT);
 if (Number.isNaN(port)) {
@@ -21,6 +23,7 @@ app.use(fileUpload({
 }));
 
 app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // features
 file(app);
