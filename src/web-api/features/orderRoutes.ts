@@ -18,6 +18,37 @@ const OrderRoute = '/order';
 const OrderRowRoute = '/order-row';
 
 const order = (app: Express) => {
+    /**
+     * @swagger
+     * /order:
+     *   post:
+     *     summary: Create a new order
+     *     description: Create a new order with the provided data.
+     *     tags:
+     *      - Order
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               description:
+     *                 type: string
+     *               orderRows:
+     *                 type: json
+     *             example:
+     *               description: example description for an order
+     *               orderRows: [
+     *                  {
+     *                      "productID": "1",
+     *                      "count": 2
+     *                  }
+     *               ]
+     *     responses:
+     *       '100':
+     *         description: User created successfully.
+     */
     app.post(
         OrderRoute,
         client_verify_log_message(
@@ -34,8 +65,8 @@ const order = (app: Express) => {
 
                 const parsedOrderRows: OrderRowModel<['productID', 'count']>[] = [];
                 let orderRows = req.body.orderRows;
-                if (typeof orderRows === 'string'){
-                    orderRows = Parser.json(req.body.orderRows)
+                if (typeof orderRows === 'string') {
+                    orderRows = Parser.json(req.body.orderRows);
                 }
                 if (!Array.isArray(orderRows)) {
                     return err({
@@ -96,6 +127,54 @@ const order = (app: Express) => {
             }
         )
     );
+    /**
+     * @swagger
+     * /order:
+     *   patch:
+     *     summary: Edit an order
+     *     description: Edit an order with the provided data.
+     *     tags:
+     *      - Order
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               id:
+     *                 type: string
+     *               description:
+     *                 type: string
+     *               addOrderRows:
+     *                 type: json
+     *               editOrderRows:
+     *                 type: json
+     *               deleteOrderRows:
+     *                 type: json
+     *             example:
+     *               description: example description for an order
+     *               addOrderRows: [
+     *                  {
+     *                      "productID": "1",
+     *                      "count": 2
+     *                  }
+     *               ]
+     *               editOrderRows: [
+     *                  {
+     *                      "productID": "2",
+     *                      "count": 3
+     *                  }
+     *               ]
+     *               removeOrderRows: [
+     *                  {
+     *                      "productID": "2"
+     *                  }
+     *               ]
+     *     responses:
+     *       '100':
+     *         description: User created successfully.
+     */
     app.patch(
         OrderRoute,
         client_verify_log_message(
@@ -250,6 +329,29 @@ const order = (app: Express) => {
             }
         )
     );
+    /**
+     * @swagger
+     * /order:
+     *   delete:
+     *     summary: Delete an order
+     *     description: Delete an order with the provided data.
+     *     tags:
+     *      - Order
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               id:
+     *                 type: string
+     *             example:
+     *               id: "1"
+     *     responses:
+     *       '100':
+     *         description: User created successfully.
+     */
     app.delete(
         OrderRoute,
         client_verify_log_message(
@@ -288,6 +390,47 @@ const order = (app: Express) => {
             }
         )
     );
+    /**
+     * @swagger
+     * /order:
+     *   get:
+     *     summary: Get Orders
+     *     description: Get orders with provided data.
+     *     tags:
+     *      - Order
+     *     parameters:
+     *       - in: query
+     *         name: start
+     *         required: false
+     *         type: string
+     *         description: The start of result from executed query output.
+     *       - in: query
+     *         name: step
+     *         required: false
+     *         type: string
+     *         description: How many result should be returned from executing query.
+     *       - in: query
+     *         name: orders
+     *         required: false
+     *         type: json
+     *         description: An array containing json objects which has 2 keys including by and direction by represents database column and direction has 2 options of asc and desc meaning in which order database should sort the output.
+     *       - in: query
+     *         name: filters
+     *         required: false
+     *         type: json
+     *         description: A json object with specific keys and values which database query will be created according to it's values.
+     *         example: {
+     *             ids: ["1", "2"],
+     *             description: ["example", "description"],
+     *             customerIDs: ["3", "4"],
+     *             statuses: ["1", "2", "3"],
+     *             prices: [["1000000"], ["500000", "1500000"]],
+     *             dates: [["2023-8-9"], ["2023-8-8", "2023-8-10"]]
+     *         }
+     *     responses:
+     *       '100':
+     *         description: Data fetched successfully
+     */
     app.get(
         OrderRoute,
         client_verify_log_message(
@@ -504,6 +647,47 @@ const order = (app: Express) => {
             }
         )
     );
+    /**
+     * @swagger
+     * /order-row:
+     *   get:
+     *     summary: Get Order Rows
+     *     description: Get order rows with provided data.
+     *     tags:
+     *      - Order
+     *     parameters:
+     *       - in: query
+     *         name: start
+     *         required: false
+     *         type: string
+     *         description: The start of result from executed query output.
+     *       - in: query
+     *         name: step
+     *         required: false
+     *         type: string
+     *         description: How many result should be returned from executing query.
+     *       - in: query
+     *         name: orders
+     *         required: false
+     *         type: json
+     *         description: An array containing json objects which has 2 keys including by and direction by represents database column and direction has 2 options of asc and desc meaning in which order database should sort the output.
+     *       - in: query
+     *         name: filters
+     *         required: false
+     *         type: json
+     *         description: A json object with specific keys and values which database query will be created according to it's values.
+     *         example: {
+     *             ids: ["1", "2"],
+     *             orderIDs: ["1", "2"],
+     *             productIDs: ["1", "2"],
+     *             discountTypes: ["1", "2"],
+     *             prices: [["1000000"], ["500000", "1500000"]],
+     *             discounts: [["1000000"], ["500000", "1500000"]],
+     *         }
+     *     responses:
+     *       '100':
+     *         description: Data fetched successfully
+     */
     app.get(
         OrderRowRoute,
         client_verify_log_message(
