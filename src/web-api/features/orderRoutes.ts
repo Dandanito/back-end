@@ -22,7 +22,14 @@ const order = (app: Express) => {
      * @swagger
      * /order:
      *   post:
-     *     summary: Create a new order
+     *     summary: Create a new order.
+     *     parameters:
+     *         - in: header
+     *           name: secret
+     *           required: true
+     *           schema:
+     *             type: string
+     *           description: API key or token for authentication
      *     description: Create a new order with the provided data.
      *     tags:
      *      - Order
@@ -131,7 +138,14 @@ const order = (app: Express) => {
      * @swagger
      * /order:
      *   patch:
-     *     summary: Edit an order
+     *     summary: Edit an order.
+     *     parameters:
+     *         - in: header
+     *           name: secret
+     *           required: true
+     *           schema:
+     *             type: string
+     *           description: API key or token for authentication
      *     description: Edit an order with the provided data.
      *     tags:
      *      - Order
@@ -333,7 +347,14 @@ const order = (app: Express) => {
      * @swagger
      * /order:
      *   delete:
-     *     summary: Delete an order
+     *     summary: Delete an order.
+     *     parameters:
+     *         - in: header
+     *           name: secret
+     *           required: true
+     *           schema:
+     *             type: string
+     *           description: API key or token for authentication
      *     description: Delete an order with the provided data.
      *     tags:
      *      - Order
@@ -394,7 +415,14 @@ const order = (app: Express) => {
      * @swagger
      * /order:
      *   get:
-     *     summary: Get Orders
+     *     summary: Get Orders.
+     *     parameters:
+     *         - in: header
+     *           name: secret
+     *           required: true
+     *           schema:
+     *             type: string
+     *           description: API key or token for authentication
      *     description: Get orders with provided data.
      *     tags:
      *      - Order
@@ -651,7 +679,14 @@ const order = (app: Express) => {
      * @swagger
      * /order-row:
      *   get:
-     *     summary: Get Order Rows
+     *     summary: Get Order Rows.
+     *     parameters:
+     *         - in: header
+     *           name: secret
+     *           required: true
+     *           schema:
+     *             type: string
+     *           description: API key or token for authentication
      *     description: Get order rows with provided data.
      *     tags:
      *      - Order

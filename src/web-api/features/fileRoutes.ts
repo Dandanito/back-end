@@ -14,7 +14,14 @@ const file = (app: Express) => {
      * @swagger
      * /file:
      *   post:
-     *     summary: Upload a file
+     *     summary: Upload a file.
+     *     parameters:
+     *         - in: header
+     *           name: secret
+     *           required: true
+     *           schema:
+     *             type: string
+     *           description: API key or token for authentication
      *     description: Upload a file.
      *     tags:
      *      - File

@@ -20,7 +20,14 @@ const product = (app: Express) => {
      * @swagger
      * /product:
      *   post:
-     *     summary: Create a new product
+     *     summary: Create a new product.
+     *     parameters:
+     *         - in: header
+     *           name: secret
+     *           required: true
+     *           schema:
+     *             type: string
+     *           description: API key or token for authentication
      *     description: Create a new product with the provided data.
      *     tags:
      *      - Product
@@ -128,7 +135,14 @@ const product = (app: Express) => {
      * @swagger
      * /product:
      *   patch:
-     *     summary: Edit a product
+     *     summary: Edit a product.
+     *     parameters:
+     *         - in: header
+     *           name: secret
+     *           required: true
+     *           schema:
+     *             type: string
+     *           description: API key or token for authentication
      *     description: Edit a product with the provided data.
      *     tags:
      *      - Product
@@ -241,7 +255,14 @@ const product = (app: Express) => {
      * @swagger
      * /product:
      *   delete:
-     *     summary: Delete a product
+     *     summary: Delete a product.
+     *     parameters:
+     *         - in: header
+     *           name: secret
+     *           required: true
+     *           schema:
+     *             type: string
+     *           description: API key or token for authentication
      *     description: Delete a product with the provided data.
      *     tags:
      *      - Product
@@ -301,7 +322,14 @@ const product = (app: Express) => {
      * @swagger
      * /order:
      *   get:
-     *     summary: Get Orders
+     *     summary: Get Orders.
+     *     parameters:
+     *         - in: header
+     *           name: secret
+     *           required: true
+     *           schema:
+     *             type: string
+     *           description: API key or token for authentication
      *     description: Get orders with provided data.
      *     tags:
      *      - Product
