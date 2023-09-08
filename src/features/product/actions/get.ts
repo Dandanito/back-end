@@ -88,7 +88,7 @@ const get = async (
     return ok({
         result: getProductsResult.value.map(e => ({
             ...e,
-            fileUUIDs: (e.fileUUIDs as string[]).map(uuid => process.env.SERVER_IP + '/public/' + uuid),
+            fileUUIDs: (e.fileUUIDs as string[]).map(uuid => `${process.env.SERVER_IP}:${process.env.PORT}/public/${uuid}`),
             finalPrice: e.discountType === DiscountType.None
                 ? e.price
                 : e.discountType === DiscountType.Amount

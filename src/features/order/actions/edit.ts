@@ -12,7 +12,6 @@ const edit = async (
     connection: Connection,
     id: OrderModel['id'],
     description?: OrderModel['description'],
-    status?: OrderModel['status'],
     addOrderRows?: OrderRowModel<['productID', 'count']>[],
     editOrderRows?: OrderRowModel<['productID', 'count']>[],
     removeProductIDs?: ProductModel['id'][]
@@ -36,7 +35,7 @@ const edit = async (
     const { customerID, status: currStatus } = checkOrderExistenceResult.value;
 
     // permission
-    if (customerID === connection.user.id) {
+    if (customerID !== connection.user.id) {
         return err([301]);
     }
 
@@ -142,7 +141,6 @@ const edit = async (
         {
             id,
             description,
-            status,
             price: totalPrice
         }
     );

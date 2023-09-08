@@ -5,7 +5,7 @@ if (connectionString === undefined) {
     throw 'please set DANDANITO_DB_CONNECTION_STRING variable in .env';
 }
 
-const pool = createPool(connectionString);
+const pool = createPool({ connectionString });
 
 if (process.env.NODE_ENV === 'development') {
     addHook({

@@ -12,6 +12,7 @@ type Error =
     | [210] /* invalid order id */
     | [211] /* invalid discount type */
     | [212] /* invalid source type */
+    | [213] /* invalid status */
     | [301] /* permission denied */
     | [302] /* lab does not exist */
     | [303] /* product does not exist */

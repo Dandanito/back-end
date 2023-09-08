@@ -14,7 +14,6 @@ const ProductTable = {
             type: 'character varying',
             nullable: false,
             default: false,
-            minLength: 2,
             maxLength: 100
         },
         description: {

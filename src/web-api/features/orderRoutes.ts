@@ -33,7 +33,10 @@ const order = (app: Express) => {
                 }
 
                 const parsedOrderRows: OrderRowModel<['productID', 'count']>[] = [];
-                const orderRows = Parser.json(req.body.orderRows);
+                let orderRows = req.body.orderRows;
+                if (typeof orderRows === 'string'){
+                    orderRows = Parser.json(req.body.orderRows)
+                }
                 if (!Array.isArray(orderRows)) {
                     return err({
                         feature: FEATURES.Order,
@@ -121,7 +124,7 @@ const order = (app: Express) => {
                 let parsedAddOrderRows: OrderRowModel<['productID', 'count']>[] | undefined;
                 if (req.body.addOrderRows !== undefined) {
                     parsedAddOrderRows = [];
-                    const addOrderRows = Parser.json(req.body.addOrderRows);
+                    let addOrderRows = Parser.json(req.body.addOrderRows);
                     if (!Array.isArray(addOrderRows)) {
                         return err({
                             feature: FEATURES.Order,

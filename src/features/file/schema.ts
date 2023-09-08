@@ -54,7 +54,6 @@ const FileModel = createModelUtils(File.table.columns, {
             const parsed = Parser.string(v);
             if (
                 parsed === undefined ||
-                parsed.length !== 36 ||
                 !EnglishNumberSignsRegex.test(parsed)
             ) {
                 return undefined;
