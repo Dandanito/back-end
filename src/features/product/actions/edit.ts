@@ -22,7 +22,11 @@ const edit = async (
         return err([208]);
     }
 
-    if (title === undefined && description === undefined && price === undefined) {
+    if (title === undefined &&
+        description === undefined &&
+        price === undefined &&
+        discount === undefined &&
+        discountType === undefined) {
         return err([205]);
     }
 
