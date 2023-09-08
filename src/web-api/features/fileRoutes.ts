@@ -39,7 +39,7 @@ const file = (app: Express) => {
         FileRoute,
         client_verify_log_message(
             FileRoute + ':upload',
-            [Role.Store, Role.Laboratory, Role.Store],
+            [Role.Admin, Role.Laboratory, Role.Store],
             async (req, _res, connection) => {
                 if (!req.files || Object.keys(req.files).length !== 1) {
                     return err({
