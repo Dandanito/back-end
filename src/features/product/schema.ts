@@ -69,7 +69,7 @@ const ProductTable = {
             type: 'smallint',
             default: false,
             nullable: false,
-            max: 2
+            max: 4
         }
     }
 } as const;
