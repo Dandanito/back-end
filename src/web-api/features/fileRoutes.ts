@@ -10,6 +10,25 @@ import client_verify_log_message from '../middlewares/client_verify_log_message'
 const FileRoute = '/file';
 
 const file = (app: Express) => {
+    /**
+     * @swagger
+     * /file:
+     *   post:
+     *     summary: Upload a file
+     *     description: Upload a file.
+     *     tags:
+     *      - File
+     *     consumes:
+     *       - multipart/form-data
+     *     parameters:
+     *       - in: formData
+     *         name: uploadedFile
+     *         type: file
+     *         description: The image file to upload.
+     *     responses:
+     *       '100':
+     *         fileUUID: a string ending with .extension .
+     */
     app.post(
         FileRoute,
         client_verify_log_message(
@@ -68,4 +87,4 @@ const file = (app: Express) => {
     );
 };
 
-export default file
+export default file;
