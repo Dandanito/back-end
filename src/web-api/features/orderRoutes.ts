@@ -217,14 +217,13 @@ const order = (app: Express) => {
                 let parsedAddOrderRows: OrderRowModel<['productID', 'count']>[] | undefined;
                 if (req.body.addOrderRows !== undefined) {
                     parsedAddOrderRows = [];
-                    let addOrderRows = Parser.json(req.body.addOrderRows);
-                    if (!Array.isArray(addOrderRows)) {
+                    if (!Array.isArray(req.body.addOrderRows)) {
                         return err({
                             feature: FEATURES.Order,
                             code: 202
                         });
                     }
-                    for (const orderRow of addOrderRows) {
+                    for (const orderRow of req.body.addOrderRows) {
                         if (!isObject(orderRow)) {
                             return err({
                                 feature: FEATURES.Order,
@@ -257,14 +256,13 @@ const order = (app: Express) => {
                 let parsedEditOrderRows: OrderRowModel<['productID', 'count']>[] | undefined;
                 if (req.body.editOrderRows !== undefined) {
                     parsedEditOrderRows = [];
-                    const editOrderRows = Parser.json(req.body.editOrderRows);
-                    if (!Array.isArray(editOrderRows)) {
+                    if (!Array.isArray(req.body.editOrderRows)) {
                         return err({
                             feature: FEATURES.Order,
                             code: 200
                         });
                     }
-                    for (const orderRow of editOrderRows) {
+                    for (const orderRow of req.body.editOrderRows) {
                         if (!isObject(orderRow)) {
                             return err({
                                 feature: FEATURES.Order,
@@ -297,14 +295,13 @@ const order = (app: Express) => {
                 let removeProductIDs: ProductModel['id'][] | undefined;
                 if (req.body.removeProductIDs !== undefined) {
                     removeProductIDs = [];
-                    const productIDs = Parser.json(req.body.removeProductIDs);
-                    if (!Array.isArray(productIDs)) {
+                    if (!Array.isArray(req.body.removeProductIDs)) {
                         return err({
                             feature: FEATURES.Order,
                             code: 202
                         });
                     }
-                    for (const productID of productIDs) {
+                    for (const productID of req.body.removeProductIDs) {
                         const parsedProductID = OrderRowModel.productID.Parse(productID, true);
                         if (parsedProductID === undefined) {
                             return err({

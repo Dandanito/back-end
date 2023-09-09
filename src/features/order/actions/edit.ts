@@ -95,22 +95,32 @@ const edit = async (
                 when: Expression<boolean>;
                 then: Expression<number>;
             }[] = [];
+            const priceSwt: {
+                when: Expression<boolean>;
+                then: Expression<bigint>;
+            }[] = []
+            console.log(getOrderRowsResult.value);
             for (const { productID, count } of editOrderRows) {
                 const correspondingRow = getOrderRowsResult.value.find(e => e.productID === productID);
                 if (correspondingRow === undefined) {
                     return err([303]);
                 }
-                totalPrice += BigInt(count - correspondingRow.count) * correspondingRow.price;
+                totalPrice += BigInt(count - correspondingRow.count) * (correspondingRow.price / BigInt(correspondingRow.count));
                 countSwt.push({
                     when: OrderRow.context.colCmp('productID', '=', productID),
                     then: count
+                });
+                priceSwt.push({
+                    when: OrderRow.context.colCmp('productID', '=', productID),
+                    then: (correspondingRow.price / BigInt(correspondingRow.count)) * BigInt(count)
                 });
             }
 
             const editOrderRowsResult = await editOrderRow(
                 connection,
                 editOrderRows.map(e => e.productID),
-                countSwt
+                countSwt,
+                priceSwt
             );
             if (!editOrderRowsResult.ok) {
                 return editOrderRowsResult;
@@ -123,12 +133,13 @@ const edit = async (
                 if (correspondingRow === undefined) {
                     return err([304]);
                 }
-                totalPrice -= correspondingRow.price;
+                totalPrice -= (correspondingRow.price * BigInt(correspondingRow.count));
             }
 
             const removeOrderRowResult = await removeOrderRow(
                 connection,
-                removeProductIDs
+                removeProductIDs,
+                id
             );
             if (!removeOrderRowResult.ok) {
                 return removeOrderRowResult;
@@ -152,7 +163,7 @@ const getOrderRows = async (
 ): Promise<Result<OrderRowModel<['productID', 'price', 'count']>[], Error>> => {
     const getOrderRowsResult = await OrderRow.select(
         ['productID', 'price', 'count'] as const,
-        context => context.colCmp('id', '=', id)
+        context => context.colCmp('orderID', '=', id)
     ).exec(client, []);
     if (!getOrderRowsResult.ok) {
         return err([401, getOrderRowsResult.error]);
@@ -164,13 +175,18 @@ const getOrderRows = async (
 const editOrderRow = async (
     { client }: Omit<Connection, 'user'>,
     productIDs: OrderRowModel['productID'][],
-    balanceSwt: {
+    countSwt: {
         when: Expression<boolean>;
         then: Expression<number>;
-    }[] = []
+    }[],
+    priceSwt: {
+        when: Expression<boolean>;
+        then: Expression<bigint>;
+    }[]
 ): Promise<Result<undefined, Error>> => {
     const editOrderRowsResult = await OrderRow.update({
-            count: U.swt(balanceSwt, OrderRow.context.col('count'))
+            count: U.swt(countSwt, OrderRow.context.col('count')),
+            price: U.swt(priceSwt, OrderRow.context.col('price'))
         },
         context => context.colList('productID', 'in', productIDs),
         ['id'] as const
@@ -184,10 +200,14 @@ const editOrderRow = async (
 
 const removeOrderRow = async (
     { client }: Omit<Connection, 'user'>,
-    productIDs: OrderRowModel['productID'][]
+    productIDs: OrderRowModel['productID'][],
+    orderID: OrderModel['id']
 ): Promise<Result<undefined, Error>> => {
     const removeOrderRowResult = await OrderRow.delete(
-        context => context.colList('productID', 'in', productIDs),
+        context => context.colsAnd({
+            orderID: ['=', orderID],
+            productID: ['in', productIDs]
+        }),
         ['id'] as const
     ).exec(client, ['get', productIDs.length]);
     if (!removeOrderRowResult.ok) {

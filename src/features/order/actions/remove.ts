@@ -60,7 +60,7 @@ const removeOrderRows = async (
     const removeOrderResult = await OrderRow.delete(
         context => context.colCmp('orderID', '=', orderID),
         ['id'] as const
-    ).exec(client, ['get', 'one']);
+    ).exec(client, []);
     if (!removeOrderResult.ok) {
         return err([401, removeOrderResult.error]);
     }
